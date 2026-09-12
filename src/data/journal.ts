@@ -153,7 +153,8 @@ export const lab: LabEntry[] = [
       "The cheap version of multi-tenancy is a tenant_id column and discipline. Discipline fails eventually.",
     approach:
       "Push isolation into PostgreSQL with row-level security so a missing WHERE clause returns nothing instead of everything, and treat the application layer as a convenience rather than the boundary.",
-    status: "ONGOING",
+    status: "PARKED",
+    result: "Designed and driven as part of the Softventory multi-tenant redesign.",
   },
   {
     id: "append-only-ledger",

@@ -110,12 +110,13 @@ export const stack: StackGroup[] = [
   {
     label: "Immersive",
     items: [
-      // TODO (Tharun): name the engine and SDK you used at Ingage — Unity, Unreal,
-      // WebXR, ARCore, ARKit — and I'll split these into proper entries.
+      { name: "Unity", note: "Headset and mobile builds during the XR internship at Ingage." },
+      { name: "Unreal Engine", note: "The other half of the engine question, same internship." },
       {
-        name: "AR / VR / XR",
-        note: "Two months building immersive experiences during an internship at Ingage.",
+        name: "WebXR / three.js",
+        note: "Immersive scenes in the browser — the same constraint I enjoyed in Mini Playground.",
       },
+      { name: "ARCore / ARKit", note: "Mobile AR: plane detection, anchors, real-world placement." },
     ],
   },
   {

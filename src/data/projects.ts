@@ -30,8 +30,7 @@ export const projects: Project[] = [
       "Feed it a website once and it builds a reusable Brand DNA — colour system, typography, voice — so everything generated afterwards comes out on-brand instead of merely on-topic.",
     status: "building",
     period: "2026 — present",
-    // TODO (Tharun): sharpen this to what you specifically own on the product.
-    role: "Currently building it",
+    role: "Full-stack feature work",
     tech: ["TypeScript", "Next.js", "React", "Tailwind CSS", "LLM APIs"],
     links: [
       { label: "brandthis.in", href: "https://brandthis.in" },
@@ -70,7 +69,8 @@ export const projects: Project[] = [
     summary:
       "An inventory control and management system used by real businesses to track stock across plants, batches and expiry dates.",
     status: "shipped",
-    period: "Jan 2026 — present",
+    // TODO (Tharun): replace with exact months, e.g. "Jan — Aug 2026".
+    period: "2026",
     role: "Lead developer",
     tech: [
       "React",
@@ -242,7 +242,7 @@ export const projects: Project[] = [
     status: "archived",
     period: "TODO",
     role: "Intern",
-    tech: [],
+    tech: ["Unity", "Unreal Engine", "WebXR", "three.js", "ARCore", "ARKit"],
     links: [],
     published: false,
     study: [],
@@ -282,7 +282,9 @@ export const experience: Job[] = [
   {
     company: "Softdigit Consulting",
     role: "Software Developer",
-    period: "Jan 2026 — Present",
+    // TODO (Tharun): the exact months, e.g. "Jan — Aug 2026". A bare year on a
+    // résumé invites the question; a range answers it before it is asked.
+    period: "2026",
     location: "Chennai, India",
     href: "https://softdigitconsulting.com/",
     product: "Softventory — Inventory Control & Management System",
@@ -299,10 +301,10 @@ export const experience: Job[] = [
     company: "Ingage",
     role: "AR/VR & XR Development Intern",
     // TODO (Tharun): the two months this ran, and two or three real bullets about
-    // what you built. Then set published: true.
+    // what you actually built. Then set published: true.
     period: "TODO — 2 months",
     location: "Chennai, India",
-    product: "Immersive / XR development",
+    product: "Immersive development — Unity, Unreal Engine, WebXR and mobile AR",
     points: [],
     published: false,
   },
