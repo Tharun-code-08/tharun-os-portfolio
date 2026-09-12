@@ -18,7 +18,7 @@ export const profile = {
 
   /** Shown under the headline. Keep it to two or three sentences. */
   intro:
-    "I'm a second-year CS undergrad already working in industry. I led development on Softventory, an enterprise inventory SaaS running in production, and I'm now building BrandThis at Claxon AI. Along the way I wrote my own browser IDE and spent two months building for headsets.",
+    "I'm a second-year CS undergrad already working in industry. I led development on Softventory, an enterprise inventory SaaS running in production, and I'm now building BrandThis at Claxon AI. My first job was two months of XR work before the degree even started, and somewhere in between I wrote my own browser IDE.",
 
   /** The status line in the menu bar and hero. Update it when the work changes. */
   status: {
@@ -28,7 +28,7 @@ export const profile = {
 
   /** The summary paragraph at the top of Recruiter Mode. Keep it to one block. */
   resumeSummary:
-    "Second-year Computer Science undergraduate already working in industry. Led development of Softventory, an enterprise inventory management SaaS running in production, and now builds BrandThis at Claxon AI. Hands-on across the full stack — TypeScript, React/Next.js, NestJS and PostgreSQL — with experience designing multi-tenant architecture and owning real deployments, plus work outside the web stack: a browser-based polyglot IDE and two months of AR/VR/XR development.",
+    "Second-year Computer Science undergraduate already working in industry, starting with an AR/VR internship the summer before the degree began. Led development of Softventory, an enterprise inventory management SaaS running in production, and now builds BrandThis at Claxon AI. Hands-on across the full stack — TypeScript, React/Next.js, NestJS and PostgreSQL — with experience designing multi-tenant architecture and owning real deployments, plus a browser-based polyglot IDE built from scratch.",
 
   os: {
     name: "THARUN OS",

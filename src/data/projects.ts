@@ -29,7 +29,7 @@ export const projects: Project[] = [
     summary:
       "Feed it a website once and it builds a reusable Brand DNA — colour system, typography, voice — so everything generated afterwards comes out on-brand instead of merely on-topic.",
     status: "building",
-    period: "2026 — present",
+    period: "Aug 2026 — present",
     role: "Full-stack feature work",
     tech: ["TypeScript", "Next.js", "React", "Tailwind CSS", "LLM APIs"],
     links: [
@@ -69,8 +69,7 @@ export const projects: Project[] = [
     summary:
       "An inventory control and management system used by real businesses to track stock across plants, batches and expiry dates.",
     status: "shipped",
-    // TODO (Tharun): replace with exact months, e.g. "Jan — Aug 2026".
-    period: "2026",
+    period: "Jan — Jul 2026",
     role: "Lead developer",
     tech: [
       "React",
@@ -240,7 +239,7 @@ export const projects: Project[] = [
     kind: "AR / VR / XR",
     summary: "TODO: what you actually built during the internship.",
     status: "archived",
-    period: "TODO",
+    period: "Jun — Jul 2025",
     role: "Intern",
     tech: ["Unity", "Unreal Engine", "WebXR", "three.js", "ARCore", "ARKit"],
     links: [],
@@ -267,8 +266,7 @@ export const experience: Job[] = [
   {
     company: "Claxon AI",
     role: "Software Development Intern",
-    // TODO (Tharun): real start month.
-    period: "2026 — Present",
+    period: "Aug 2026 — Present",
     location: "Chennai, India",
     href: "https://claxonai.in",
     product: "BrandThis — brand intelligence for generative work",
@@ -282,9 +280,7 @@ export const experience: Job[] = [
   {
     company: "Softdigit Consulting",
     role: "Software Developer",
-    // TODO (Tharun): the exact months, e.g. "Jan — Aug 2026". A bare year on a
-    // résumé invites the question; a range answers it before it is asked.
-    period: "2026",
+    period: "Jan — Jul 2026",
     location: "Chennai, India",
     href: "https://softdigitconsulting.com/",
     product: "Softventory — Inventory Control & Management System",
@@ -300,13 +296,17 @@ export const experience: Job[] = [
   {
     company: "Ingage",
     role: "AR/VR & XR Development Intern",
-    // TODO (Tharun): the two months this ran, and two or three real bullets about
-    // what you actually built. Then set published: true.
-    period: "TODO — 2 months",
+    period: "Jun — Jul 2025",
     location: "Chennai, India",
     product: "Immersive development — Unity, Unreal Engine, WebXR and mobile AR",
-    points: [],
-    published: false,
+    // TODO (Tharun): add one concrete line — the thing you actually built and
+    // what it did. These two bullets place the internship; a real artefact
+    // would make it the most memorable entry on the résumé.
+    points: [
+      "Two months of immersive development spanning Unity and Unreal Engine, WebXR and three.js in the browser, and mobile AR with ARCore and ARKit.",
+      "My first professional development work, taken the summer before starting the Computer Science degree.",
+    ],
+    published: true,
   },
 ];
 

@@ -36,9 +36,10 @@ export function MeApp() {
             website and turns it into a Brand DNA a model can actually work from.
           </p>
           <p>
-            In between I have gone sideways on purpose. I wrote my own browser IDE that runs ten-plus
-            languages with no backend, and spent two months building AR, VR and XR experiences at an
-            internship. Neither was on a syllabus either.
+            It did not start with web. My first job was two months of AR, VR and XR development at
+            Ingage — Unity, Unreal, WebXR, mobile AR — in the summer before the degree began. I have
+            kept going sideways since: I wrote my own browser IDE that runs ten-plus languages with
+            no backend, Python and SQLite included.
           </p>
           <p>
             The work I like most is the unglamorous kind — tenant isolation that holds when someone

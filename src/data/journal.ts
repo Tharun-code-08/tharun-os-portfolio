@@ -22,14 +22,8 @@ export type LogEntry = {
 
 /**
  * Dates here come from your resume and from public activity on
- * github.com/Tharun-code-08 — they are last-activity dates, not start dates.
+ * github.com/Tharun-code-08 — repo dates are last-activity, not start dates.
  * Rewrite any line that misremembers how it actually went.
- *
- * TODO (Tharun): two entries are missing because I do not know their dates,
- * and a portfolio with an invented date on it is worse than one with a gap:
- *   - START  — the month you joined Claxon AI
- *   - START  — the two months of the Ingage AR/VR/XR internship
- * Add them in the same shape as the lines below and they slot into the timeline.
  */
 export const buildLog: LogEntry[] = [
   {
@@ -45,6 +39,14 @@ export const buildLog: LogEntry[] = [
     kind: "LEARN",
     title: "Started taking DSA seriously",
     detail: "Working through LeetCode most days. A year of shipping features exposed the gaps.",
+  },
+  {
+    date: "2026-08-01",
+    kind: "START",
+    title: "Joined Claxon AI",
+    detail:
+      "Left Softdigit after seven months and moved to an agent-runtime company. From owning one product's stack to shipping features on someone else's.",
+    href: "https://claxonai.in",
   },
   {
     date: "2026-07-22",
@@ -100,21 +102,29 @@ export const buildLog: LogEntry[] = [
     date: "2026-01-01",
     kind: "START",
     title: "Joined Softdigit Consulting as a Software Developer",
-    detail: "Second year of a CS degree, leading development on a product with real users.",
+    detail:
+      "First year of a CS degree, leading development on a product with real users. Ran to July 2026.",
     href: "https://softdigitconsulting.com/",
   },
   {
     date: "2025-08-01",
     kind: "START",
     title: "Started B.E. Computer Science at Sathyabama",
-    detail: "Chennai. Class of 2029.",
+    detail: "Chennai. Class of 2029 — and already two months of professional work behind me.",
   },
   {
     date: "2025-06-05",
     kind: "START",
     title: "Started pushing code in public",
-    detail: "First commits on GitHub.",
+    detail: "First commits on GitHub, the same week the Ingage internship began.",
     href: "https://github.com/Tharun-code-08",
+  },
+  {
+    date: "2025-06-01",
+    kind: "START",
+    title: "First job was in XR, before university",
+    detail:
+      "Two months at Ingage building immersive work across Unity, Unreal, WebXR and mobile AR — the summer before the CS degree started.",
   },
 ];
 

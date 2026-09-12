@@ -30,7 +30,7 @@ export function proofStats(now: Date = new Date()) {
     {
       value: String(monthsShipping(now)),
       label: "months in industry",
-      note: "Writing production software since January 2026, from the second year of a CS degree.",
+      note: "Writing production software continuously since January 2026, after an AR/VR internship in mid-2025.",
     },
     {
       value: "2",
