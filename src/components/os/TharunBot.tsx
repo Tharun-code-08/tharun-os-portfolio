@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { botSay, useBot, type Emotion, type Pose } from "@/lib/bot";
+import { WALK_MS, type CinematicState } from "@/lib/cinematic";
 
 type R = [number, number, number, number, string];
 
@@ -74,7 +75,7 @@ function face(emotion: Emotion, look: { x: number; y: number }): R[] {
   return [...eyes[emotion], ...mouth[emotion]];
 }
 
-function body(pose: Pose): R[] {
+function body(pose: Pose, frame: "a" | "b"): R[] {
   const base: R[] = [
     // head + hair
     [6, 0, 12, 11, SKIN],
@@ -100,6 +101,23 @@ function body(pose: Pose): R[] {
     [12, 56, 9, 4, SHOE],
     [1, 60, 22, 2, "#00000038"],
   ];
+
+  // Legs swap during a walk; the CSS class alternates the two frames.
+  const legs: Record<"a" | "b", R[]> =
+    {
+      a: [
+        [4, 34, 6, 22, PANTS],
+        [14, 34, 6, 20, PANTS],
+        [2, 54, 9, 4, SHOE],
+        [13, 56, 9, 4, SHOE],
+      ],
+      b: [
+        [5, 34, 6, 20, PANTS],
+        [13, 34, 6, 22, PANTS],
+        [3, 56, 9, 4, SHOE],
+        [14, 54, 9, 4, SHOE],
+      ],
+    };
 
   const arms: Record<Pose, R[]> = {
     idle: [
@@ -133,14 +151,27 @@ function body(pose: Pose): R[] {
       [19, 16, 4, 8, SHIRT_DK],
       [16, 10, 5, 5, SKIN],
     ],
+    walk: [
+      [0, 18, 4, 12, SHIRT_DK],
+      [20, 16, 4, 12, SHIRT_DK],
+      [0, 30, 4, 4, SKIN],
+      [20, 28, 4, 4, SKIN],
+    ],
   };
+
+  if (pose === "walk") {
+    // Drop the static legs and shoes; the walk frames replace them.
+    const still = base.filter((_, i) => i < 11 || i > 15);
+    return [...still, ...legs[frame], ...arms.walk];
+  }
 
   return [...base, ...arms[pose]];
 }
 
-export function TharunBot() {
-  const { line, emotion, pose } = useBot();
+export function TharunBot({ cinematic }: { cinematic: CinematicState }) {
+  const { line, emotion } = useBot();
   const [look, setLook] = useState({ x: 0, y: 0 });
+  const [frame, setFrame] = useState<"a" | "b">("a");
 
   // Subtle head/eye tracking. One pixel of travel is plenty at this scale.
   useEffect(() => {
@@ -156,17 +187,38 @@ export function TharunBot() {
     return () => window.removeEventListener("pointermove", onMove);
   }, []);
 
-  const parts = [...body(pose), ...face(emotion, look)];
+  // Leg cycle, only while actually crossing the room.
+  useEffect(() => {
+    if (!cinematic.walking) return;
+    const id = window.setInterval(() => setFrame((f) => (f === "a" ? "b" : "a")), 130);
+    return () => clearInterval(id);
+  }, [cinematic.walking]);
+
+  const mark = cinematic.scene.bot;
+  // A spoken line always wins over the scene's scripted pose.
+  const activePose: Pose = cinematic.walking ? "walk" : (line?.pose ?? mark.pose);
+  const parts = [...body(activePose, frame), ...face(emotion, look)];
 
   return (
-    <div className="pointer-events-none absolute right-[4%] bottom-[11%] z-20 hidden h-[26vh] max-h-[260px] min-h-[150px] lg:block">
+    <div
+      className="pointer-events-none absolute bottom-[11%] z-20 hidden h-[26vh] max-h-[260px] min-h-[150px] lg:block"
+      style={{
+        left: `${mark.x}%`,
+        transform: `translate(-50%, ${-mark.y}%) scale(${mark.scale})`,
+        transformOrigin: "bottom center",
+        transition: `left ${WALK_MS}ms cubic-bezier(0.37,0,0.63,1), transform 700ms cubic-bezier(0.2,0.8,0.2,1)`,
+      }}
+    >
       {line ? (
-        <div className="animate-fade-up pointer-events-auto absolute right-full bottom-[62%] mr-3 w-[17rem]">
-          <div className="rounded-lg rounded-br-none border border-line bg-surface/96 px-3.5 py-3 shadow-2xl backdrop-blur-xl">
+        <div
+          className={`animate-fade-up pointer-events-auto absolute bottom-[62%] w-[17rem] ${
+            mark.x > 55 ? "right-full mr-3" : "left-full ml-3"
+          }`}
+        >
+          <div className="rounded-lg border border-line bg-surface/96 px-3.5 py-3 shadow-2xl backdrop-blur-xl">
             <p className="mb-1 font-mono text-[9px] tracking-[0.22em] text-accent">THARUNBOT</p>
             <p className="text-[12.5px] leading-relaxed text-ink">{line.text}</p>
           </div>
-          <div className="ml-auto h-2.5 w-2.5 -translate-y-px border-r border-b border-line bg-surface/96" />
         </div>
       ) : null}
 
@@ -180,6 +232,7 @@ export function TharunBot() {
           viewBox="0 0 34 64"
           shapeRendering="crispEdges"
           className="h-full w-auto drop-shadow-[0_8px_18px_rgba(0,0,0,0.55)]"
+          style={{ transform: `scaleX(${mark.facing})` }}
           aria-hidden="true"
         >
           {parts.map(([x, y, w, h, fill], i) => (

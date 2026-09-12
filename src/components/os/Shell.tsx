@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
-import { OsProvider, useOs, type SnapZone } from "@/lib/os";
+import { OsProvider, SPACES, useOs, type SnapZone } from "@/lib/os";
+import { botSay } from "@/lib/bot";
+import { hasSkipped, useCinematic } from "@/lib/cinematic";
 import type { AppId } from "@/lib/apps";
 import { Boot } from "./Boot";
 import { Desktop } from "./Desktop";
@@ -9,6 +11,7 @@ import { DesktopContextMenu, SnapPreview } from "./DesktopExtras";
 import { Dock } from "./Dock";
 import { MenuBar } from "./MenuBar";
 import { MissionControl } from "./MissionControl";
+import { DeveloperMode } from "./DeveloperMode";
 import { MobileShell } from "./MobileShell";
 import { Window } from "./Window";
 import { AppHost } from "./AppHost";
@@ -67,8 +70,15 @@ function ShellInner() {
   const [palette, setPalette] = useState(false);
   const [recruiter, setRecruiter] = useState(false);
   const [mission, setMission] = useState(false);
+  const [devMode, setDevMode] = useState(false);
   const [snapHint, setSnapHint] = useState<SnapZone | null>(null);
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
+  const [skipped, setSkipped] = useState(() => hasSkipped());
+
+  // The visitor always wins: the loop only runs on a clear, quiet desktop.
+  const cinematicOn =
+    !skipped && !booting && !recruiter && !devMode && !palette && !mission && os.wins.length === 0;
+  const cinematic = useCinematic(cinematicOn);
 
   const openPalette = useCallback(() => setPalette(true), []);
   const openMission = useCallback(() => setMission(true), []);
@@ -89,6 +99,13 @@ function ShellInner() {
       if (e.key === "F2") {
         e.preventDefault();
         setMission((m) => !m);
+        return;
+      }
+
+      // ⌃1/⌃2/⌃3 switch desks — deliberately not ⌘, which opens apps.
+      if (e.ctrlKey && !e.metaKey && /^[123]$/.test(e.key)) {
+        e.preventDefault();
+        os.setSpace(SPACES[Number(e.key) - 1].id);
         return;
       }
 
@@ -143,6 +160,13 @@ function ShellInner() {
         e.preventDefault();
         setRecruiter((r) => !r);
       }
+      if (e.key.toLowerCase() === "d") {
+        e.preventDefault();
+        setDevMode((d) => {
+          if (!d) botSay("devmode");
+          return !d;
+        });
+      }
       if (e.key === "/") {
         e.preventDefault();
         setPalette(true);
@@ -191,7 +215,7 @@ function ShellInner() {
         onMissionControl={openMission}
       />
 
-      <Desktop />
+      <Desktop cinematic={cinematic} onSkip={() => setSkipped(true)} />
 
       {os.wins.map((win) => (
         <Window key={win.id} win={win} topZ={topZ} onSnapHint={setSnapHint}>
@@ -204,6 +228,7 @@ function ShellInner() {
 
       {palette ? <CommandPalette onClose={() => setPalette(false)} /> : null}
       {mission ? <MissionControl onClose={() => setMission(false)} /> : null}
+      {devMode ? <DeveloperMode onClose={() => setDevMode(false)} /> : null}
       <DesktopContextMenu
         menu={menu}
         onClose={() => setMenu(null)}

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { profile } from "@/data/profile";
-import { useOs } from "@/lib/os";
+import { SPACES, useOs } from "@/lib/os";
 
 export function MenuBar({
   onCommand,
@@ -40,12 +40,32 @@ export function MenuBar({
           v{profile.os.version} · {profile.os.edition}
         </span>
 
+        <nav aria-label="Desks" className="hidden items-center gap-0.5 md:flex">
+          {SPACES.map((s, i) => {
+            const on = s.id === os.space;
+            return (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => os.setSpace(s.id)}
+                title={`${s.hint}  ·  Ctrl+${i + 1}`}
+                aria-pressed={on}
+                className={`rounded px-2 py-0.5 font-mono text-[10px] tracking-[0.14em] transition-colors ${
+                  on ? "bg-accent/15 text-accent" : "text-faint hover:text-ink"
+                }`}
+              >
+                {s.label.toUpperCase()}
+              </button>
+            );
+          })}
+        </nav>
+
         {os.wins.length > 0 ? (
           <button
             type="button"
             onClick={onMissionControl}
             title="Mission Control (F2)"
-            className="hidden font-mono text-[10px] tracking-[0.14em] text-faint transition-colors hover:text-accent md:inline"
+            className="hidden font-mono text-[10px] tracking-[0.14em] text-faint transition-colors hover:text-accent lg:inline"
           >
             WINDOWS ({os.wins.length})
           </button>

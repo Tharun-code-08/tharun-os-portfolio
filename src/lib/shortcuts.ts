@@ -8,6 +8,8 @@ export const SHORTCUTS = [
   { keys: "⌘1 … ⌘5", label: "Open Work, Lab, Build log, Now, Terminal" },
   { keys: "⌘,", label: "Open Settings" },
   { keys: "F2", label: "Mission Control — every open window at once" },
+  { keys: "Ctrl+1 … Ctrl+3", label: "Switch desk — Personal, Work, Lab" },
+  { keys: "D", label: "Developer Mode — how this site is actually wired up" },
   { keys: "R", label: "Recruiter Mode" },
   { keys: "Esc", label: "Close the front window, or leave Mission Control" },
 ] as const;

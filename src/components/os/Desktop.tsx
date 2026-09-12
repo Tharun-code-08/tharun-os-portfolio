@@ -7,21 +7,59 @@ import { now } from "@/data/profile";
 import { sites } from "@/data/sites";
 import { desktopApps } from "@/lib/apps";
 import { botSay } from "@/lib/bot";
-import { useOs } from "@/lib/os";
+import { SPACES, useOs } from "@/lib/os";
+import { SCENES, rememberSkip, type CinematicState } from "@/lib/cinematic";
 import { Icon } from "./Icon";
 import { Scene } from "./Scene";
+import { Atmosphere } from "./Atmosphere";
 import { TharunBot } from "./TharunBot";
 
-export function Desktop() {
+/** "rgba(r, g, b, a)" → [r, g, b] in 0-1, for the shader uniform. */
+function rgb(css: string): [number, number, number] {
+  const m = css.match(/[\d.]+/g);
+  if (!m) return [1, 1, 1];
+  return [Number(m[0]) / 255, Number(m[1]) / 255, Number(m[2]) / 255];
+}
+
+export function Desktop({
+  cinematic,
+  onSkip,
+}: {
+  cinematic: CinematicState;
+  onSkip: () => void;
+}) {
   const os = useOs();
   const latest = [...buildLog].sort((a, b) => b.date.localeCompare(a.date))[0];
   const [transmission, setTransmission] = useState(true);
+
+  const space = SPACES.find((s) => s.id === os.space) ?? SPACES[0];
+  // The scene sets the hour of day; the desk sets the mood of the room.
+  const light = cinematic.playing ? cinematic.scene.light : space.light;
+  const cam = cinematic.playing ? cinematic.scene.camera : { x: 0, y: 0, scale: 1 };
 
   return (
     <>
       {/* Wallpaper. Pointer-events off so the icons and windows own every click. */}
       <div className="pointer-events-none absolute inset-0 top-[34px] z-0 overflow-hidden">
-        <Scene className="h-full w-full" />
+        {/* Camera moves the world only — the OS chrome never shifts. */}
+        <div
+          className="absolute inset-0"
+          style={{
+            transform: `translate(${cam.x}%, ${cam.y}%) scale(${cam.scale})`,
+            transition: "transform 2600ms cubic-bezier(0.33, 0, 0.2, 1)",
+            transformOrigin: "70% 70%",
+          }}
+        >
+          <Scene className="h-full w-full" />
+          <Atmosphere tint={rgb(light)} strength={cinematic.playing ? 1 : 0.55} />
+        </div>
+
+        {/* Hour-of-day wash, driven by the active scene. */}
+        <div
+          className="absolute inset-0 mix-blend-screen"
+          style={{ background: light, transition: "background 2200ms linear" }}
+        />
+
         {/* Dark where the icons and type sit, clear over the window and the
             character — so the room stays vivid and the text stays readable. */}
         <div className="absolute inset-0 bg-gradient-to-r from-bg/88 via-bg/55 to-bg/10" />
@@ -132,7 +170,35 @@ export function Desktop() {
         </aside>
       ) : null}
 
-      <TharunBot />
+      {cinematic.playing ? (
+        <div className="absolute bottom-6 left-5 z-20 hidden items-center gap-3 lg:flex">
+          <span className="font-mono text-[9.5px] tracking-[0.24em] text-ink/50">
+            {String(cinematic.index + 1).padStart(2, "0")} {cinematic.scene.label}
+          </span>
+          <span className="flex gap-1">
+            {SCENES.map((s, i) => (
+              <span
+                key={s.id}
+                className={`h-1 rounded-full transition-all duration-500 ${
+                  i === cinematic.index ? "w-4 bg-accent" : "w-1 bg-ink/25"
+                }`}
+              />
+            ))}
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              rememberSkip();
+              onSkip();
+            }}
+            className="font-mono text-[9.5px] tracking-[0.16em] text-ink/40 transition-colors hover:text-accent"
+          >
+            SKIP INTRO →
+          </button>
+        </div>
+      ) : null}
+
+      <TharunBot cinematic={cinematic} />
     </>
   );
 }

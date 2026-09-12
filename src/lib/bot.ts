@@ -17,7 +17,7 @@ import { useEffect, useState } from "react";
  */
 
 export type Emotion = "neutral" | "happy" | "curious" | "thinking" | "surprised" | "proud" | "playful";
-export type Pose = "idle" | "wave" | "point" | "type" | "think";
+export type Pose = "idle" | "wave" | "point" | "type" | "think" | "walk";
 
 export type BotEvent =
   | "enter"
@@ -25,6 +25,8 @@ export type BotEvent =
   | "idle"
   | `open:${string}`
   | `hover:${string}`
+  | `space:${string}`
+  | "devmode"
   | "closed-all"
   | "summon";
 
@@ -242,6 +244,82 @@ export const LINES: Line[] = [
     pose: "wave",
     priority: 95,
   },
+
+  // --- relationship tiers --------------------------------------------------
+  {
+    id: "tier-curious",
+    on: "idle",
+    text: "You're still here. Most people leave after the projects.",
+    emotion: "surprised",
+    pose: "idle",
+    priority: 30,
+    once: true,
+    requires: "tier:2",
+  },
+  {
+    id: "tier-deep",
+    on: "idle",
+    text: "You really do read the architecture bits, don't you.",
+    emotion: "happy",
+    pose: "think",
+    priority: 35,
+    once: true,
+    requires: "tier:3",
+  },
+  {
+    id: "tier-regular",
+    on: "idle",
+    text: "You've been here before. At this point you may as well email me.",
+    emotion: "playful",
+    pose: "point",
+    priority: 40,
+    once: true,
+    requires: "tier:4",
+  },
+  {
+    id: "devmode",
+    on: "idle",
+    text: "Press D if you want to see how this is actually wired up.",
+    emotion: "curious",
+    pose: "idle",
+    priority: 25,
+    once: true,
+    requires: "tier:2",
+  },
+
+  // --- spaces + developer mode --------------------------------------------
+  {
+    id: "space-work",
+    on: "space:work",
+    text: "Work desk. Everything I've shipped lives here.",
+    emotion: "proud",
+    pose: "point",
+    priority: 80,
+  },
+  {
+    id: "space-lab",
+    on: "space:lab",
+    text: "Cooler light in here. This is the messy side.",
+    emotion: "curious",
+    pose: "think",
+    priority: 80,
+  },
+  {
+    id: "space-personal",
+    on: "space:personal",
+    text: "Back to the warm desk.",
+    emotion: "happy",
+    pose: "idle",
+    priority: 80,
+  },
+  {
+    id: "dev-on",
+    on: "devmode",
+    text: "Okay — let's look at the system.",
+    emotion: "playful",
+    pose: "type",
+    priority: 92,
+  },
 ];
 
 /* ------------------------------------------------------------------ state - */
@@ -268,12 +346,37 @@ function writeFlags(flags: Flags) {
   }
 }
 
-/** True once the visitor has opened three or more different apps. */
+/**
+ * Relationship tier — session-local only, never persisted to a profile and
+ * never tied to anything identifying. It exists so the bot can stop explaining
+ * the basics to someone who has clearly already understood them.
+ *
+ *   0 visitor · 1 explorer · 2 curious · 3 deep dive · 4 regular
+ */
+export const TIER_NAMES = ["Visitor", "Explorer", "Curious", "Deep dive", "Regular"] as const;
+
+export function tier(): number {
+  const flags = readFlags();
+  const opened = Object.keys(flags).filter((k) => k.startsWith("opened:")).length;
+  let t = 0;
+  if (opened >= 2) t = 1;
+  if (opened >= 4) t = 2;
+  if (opened >= 6 || flags["opened:project"]) t = 3;
+  if (flags.returning && opened >= 3) t = 4;
+  return t;
+}
+
 export function markOpened(appId: string) {
   const flags = readFlags();
   flags[`opened:${appId}`] = true;
   const count = Object.keys(flags).filter((k) => k.startsWith("opened:")).length;
   if (count >= 3) flags.explorer = true;
+  writeFlags(flags);
+}
+
+export function markReturning() {
+  const flags = readFlags();
+  flags.returning = true;
   writeFlags(flags);
 }
 
@@ -318,9 +421,14 @@ export function pickLine(event: BotEvent): Line | null {
     if (!matches(line, event)) return false;
     if (line.once && fired.has(line.id)) return false;
     if (line.requires) {
-      const negate = line.requires.startsWith("!");
-      const key = negate ? line.requires.slice(1) : line.requires;
-      if (negate ? flags[key] : !flags[key]) return false;
+      // "tier:3" gates on relationship depth; "!flag" inverts a flag.
+      if (line.requires.startsWith("tier:")) {
+        if (tier() < Number(line.requires.slice(5))) return false;
+      } else {
+        const negate = line.requires.startsWith("!");
+        const key = negate ? line.requires.slice(1) : line.requires;
+        if (negate ? flags[key] : !flags[key]) return false;
+      }
     }
     if (event === "idle" && line.id === lastAmbient) return false;
     return true;
@@ -371,7 +479,11 @@ export function useBot(): BotState {
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const first = window.setTimeout(() => botSay(isReturning() ? "return" : "enter"), 1200);
+    const first = window.setTimeout(() => {
+      const back = isReturning();
+      if (back) markReturning();
+      botSay(back ? "return" : "enter");
+    }, 1200);
     const ambient = reduced ? null : window.setInterval(() => botSay("idle"), AMBIENT_EVERY);
 
     return () => {

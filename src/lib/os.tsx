@@ -16,6 +16,15 @@ export type WinRect = { x: number; y: number; w: number; h: number };
 
 export type SnapZone = "left" | "right" | "top";
 
+/** Three desks. Windows belong to whichever one was active when they opened. */
+export type SpaceId = "personal" | "work" | "lab";
+
+export const SPACES: { id: SpaceId; label: string; hint: string; light: string }[] = [
+  { id: "personal", label: "Personal", hint: "Me, the journey, the notes", light: "rgba(255, 186, 110, 0.10)" },
+  { id: "work", label: "Work", hint: "Projects, proof, the stack", light: "rgba(210, 225, 255, 0.07)" },
+  { id: "lab", label: "Lab", hint: "Open questions and the terminal", light: "rgba(120, 170, 255, 0.13)" },
+];
+
 export type Win = WinRect & {
   /** Instance id. Usually the app id, but detail views append a slug. */
   id: string;
@@ -27,9 +36,11 @@ export type Win = WinRect & {
   restore?: WinRect;
   /** Extra data for the app, e.g. which project a detail view shows. */
   payload?: string;
+  /** Which desk this window lives on. */
+  space: SpaceId;
 };
 
-type State = { wins: Win[]; z: number; cascade: number };
+type State = { wins: Win[]; z: number; cascade: number; space: SpaceId };
 
 type Viewport = { w: number; h: number };
 
@@ -43,7 +54,8 @@ type Action =
   | { type: "toggleMax"; id: string; viewport: Viewport }
   | { type: "snap"; id: string; zone: SnapZone; viewport: Viewport }
   | { type: "closeAll" }
-  | { type: "restoreAll" };
+  | { type: "restoreAll" }
+  | { type: "setSpace"; space: SpaceId };
 
 const TOP_BAR = 34;
 const DOCK_SPACE = 96;
@@ -72,7 +84,8 @@ function clampRect(r: WinRect, vp: Viewport): WinRect {
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "open": {
-      const id = action.payload ? `${action.appId}:${action.payload}` : action.appId;
+      const id =
+        (action.payload ? `${action.appId}:${action.payload}` : action.appId) + `@${state.space}`;
       const existing = state.wins.find((w) => w.id === id);
       const z = state.z + 1;
 
@@ -108,6 +121,7 @@ function reducer(state: State, action: Action): State {
             minimized: false,
             maximized: false,
             payload: action.payload,
+            space: state.space,
           },
         ],
       };
@@ -117,7 +131,10 @@ function reducer(state: State, action: Action): State {
       return { ...state, wins: state.wins.filter((w) => w.id !== action.id) };
 
     case "closeAll":
-      return { ...state, wins: [] };
+      return { ...state, wins: state.wins.filter((w) => w.space !== state.space) };
+
+    case "setSpace":
+      return { ...state, space: action.space };
 
     case "restoreAll":
       return { ...state, wins: state.wins.map((w) => ({ ...w, minimized: false })) };
@@ -198,7 +215,7 @@ function reducer(state: State, action: Action): State {
  * it is still there. Read lazily so the server render stays deterministic.
  */
 function initState(): State {
-  const empty: State = { wins: [], z: 10, cascade: 0 };
+  const empty: State = { wins: [], z: 10, cascade: 0, space: "personal" };
   if (typeof window === "undefined") return empty;
   try {
     const raw = localStorage.getItem(SESSION_KEY);
@@ -207,7 +224,7 @@ function initState(): State {
     if (!Array.isArray(saved.wins)) return empty;
     // Drop anything pointing at an app that no longer exists or is unavailable.
     const wins = saved.wins.filter((w) => APPS[w.appId]?.available);
-    return { wins, z: saved.z ?? 10, cascade: saved.cascade ?? 0 };
+    return { wins, z: saved.z ?? 10, cascade: saved.cascade ?? 0, space: saved.space ?? "personal" };
   } catch {
     return empty;
   }
@@ -219,6 +236,8 @@ type OsApi = {
   close: (id: string) => void;
   closeAll: () => void;
   restoreAll: () => void;
+  space: SpaceId;
+  setSpace: (space: SpaceId) => void;
   focus: (id: string) => void;
   move: (id: string, x: number, y: number) => void;
   resize: (id: string, w: number, h: number) => void;
@@ -256,21 +275,30 @@ export function OsProvider({ children }: { children: ReactNode }) {
 
   const api = useMemo<OsApi>(
     () => ({
-      wins: state.wins,
+      wins: state.wins.filter((w) => w.space === state.space),
       open,
       close: (id) => dispatch({ type: "close", id }),
       closeAll: () => dispatch({ type: "closeAll" }),
       restoreAll: () => dispatch({ type: "restoreAll" }),
+      space: state.space,
+      setSpace: (space) => {
+        dispatch({ type: "setSpace", space });
+        botSay(`space:${space}`);
+      },
       focus: (id) => dispatch({ type: "focus", id }),
       move: (id, x, y) => dispatch({ type: "move", id, x, y }),
       resize: (id, w, h) => dispatch({ type: "resize", id, w, h }),
       minimize: (id) => dispatch({ type: "minimize", id }),
       toggleMax: (id) => dispatch({ type: "toggleMax", id, viewport: viewport() }),
       snap: (id, zone) => dispatch({ type: "snap", id, zone, viewport: viewport() }),
-      isOpen: (appId) => state.wins.some((w) => w.appId === appId && !w.minimized),
-      topWindow: () => state.wins.filter((w) => !w.minimized).sort((a, b) => b.z - a.z)[0],
+      isOpen: (appId) =>
+        state.wins.some((w) => w.appId === appId && w.space === state.space && !w.minimized),
+      topWindow: () =>
+        state.wins
+          .filter((w) => w.space === state.space && !w.minimized)
+          .sort((a, b) => b.z - a.z)[0],
     }),
-    [state.wins, open],
+    [state.wins, state.space, open],
   );
 
   return <OsContext.Provider value={api}>{children}</OsContext.Provider>;

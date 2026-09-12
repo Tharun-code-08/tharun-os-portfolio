@@ -57,6 +57,37 @@ want a real pixel avatar of yourself.
 
 Desktop icons sit on top in a grid: single click selects, double click opens.
 
+## The 15-second loop
+
+Five scenes, three seconds each — WAKE, DISCOVER, BUILD, THINK, INVITE — defined in
+[`cinematic.ts`](src/lib/cinematic.ts). The character walks between marks with a two-frame leg
+cycle, the camera reframes, and the light shifts from morning through to night. **The OS chrome
+never moves**; only the world layer animates underneath it.
+
+The rule that matters: **the visitor always wins**. Open a window, the palette, Mission Control,
+Recruiter or Developer Mode and the loop pauses exactly where it is. It resumes only when the desk
+is clear again. `SKIP INTRO` is remembered, so returning visitors never see it twice, and
+`prefers-reduced-motion` disables it outright.
+
+## Spaces
+
+Three desks — Personal, Work, Lab — switched with `Ctrl+1/2/3` or the menu bar. Windows belong to
+the desk they were opened on, so the same app can be open on two desks at once, and each desk has
+its own light. Close-all only closes the desk you're standing at.
+
+## Developer Mode
+
+Press `D`. A live read-out of the running app: the process tree of open windows with sizes and
+z-order, the runtime, the content-model counts straight out of `src/data`, the public API, and the
+current relationship tier. Every number is read at render time — if one is wrong, the site is wrong.
+
+## Atmosphere
+
+One WebGL fragment shader draws drifting dust, a soft window shaft and film grain over the SVG
+room ([`Atmosphere.tsx`](src/components/os/Atmosphere.tsx)). It is additive only — no library, half
+resolution, paused on a hidden tab, and skipped entirely without WebGL or under reduced motion. The
+room is still vector art underneath.
+
 ## TharunBOT
 
 The character is a behaviour engine, not decoration — [`src/lib/bot.ts`](src/lib/bot.ts) holds a
