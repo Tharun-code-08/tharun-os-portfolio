@@ -27,6 +27,8 @@ export type AppDef = {
   size: { w: number; h: number };
   /** Position in the dock. Omit to keep it out of the dock. */
   dock?: number;
+  /** Position on the desktop grid. Omit and it lives only in the dock. */
+  desktop?: number;
   /** Extra words the command palette should match on. */
   keywords: string[];
   /** False hides it everywhere — used for sections with no content yet. */
@@ -42,6 +44,7 @@ export const APPS: Record<AppId, AppDef> = {
     icon: "me",
     size: { w: 620, h: 560 },
     dock: 1,
+    desktop: 1,
     keywords: ["about", "bio", "who", "intro", "story"],
     available: true,
   },
@@ -53,6 +56,7 @@ export const APPS: Record<AppId, AppDef> = {
     icon: "work",
     size: { w: 860, h: 620 },
     dock: 2,
+    desktop: 2,
     keywords: ["projects", "portfolio", "softventory", "case study", "built"],
     available: true,
   },
@@ -74,6 +78,7 @@ export const APPS: Record<AppId, AppDef> = {
     icon: "lab",
     size: { w: 760, h: 600 },
     dock: 3,
+    desktop: 3,
     keywords: ["experiments", "questions", "research", "trying"],
     available: lab.length > 0,
   },
@@ -85,6 +90,7 @@ export const APPS: Record<AppId, AppDef> = {
     icon: "log",
     size: { w: 720, h: 600 },
     dock: 4,
+    desktop: 5,
     keywords: ["changelog", "timeline", "journey", "history"],
     available: true,
   },
@@ -96,6 +102,7 @@ export const APPS: Record<AppId, AppDef> = {
     icon: "stack",
     size: { w: 740, h: 580 },
     dock: 5,
+    desktop: 6,
     keywords: ["skills", "tech", "languages", "tools", "typescript"],
     available: true,
   },
@@ -107,6 +114,7 @@ export const APPS: Record<AppId, AppDef> = {
     icon: "now",
     size: { w: 640, h: 540 },
     dock: 6,
+    desktop: 4,
     keywords: ["current", "today", "building", "learning"],
     available: true,
   },
@@ -118,6 +126,7 @@ export const APPS: Record<AppId, AppDef> = {
     icon: "proof",
     size: { w: 720, h: 580 },
     dock: 7,
+    desktop: 7,
     keywords: ["evidence", "github", "stats", "numbers", "resume"],
     available: true,
   },
@@ -151,6 +160,7 @@ export const APPS: Record<AppId, AppDef> = {
     icon: "contact",
     size: { w: 620, h: 580 },
     dock: 10,
+    desktop: 8,
     keywords: ["email", "hire", "reach", "linkedin", "phone", "talk"],
     available: true,
   },
@@ -192,5 +202,9 @@ export const APPS: Record<AppId, AppDef> = {
 export const dockApps = Object.values(APPS)
   .filter((a) => a.dock !== undefined && a.available)
   .sort((a, b) => (a.dock ?? 99) - (b.dock ?? 99));
+
+export const desktopApps = Object.values(APPS)
+  .filter((a) => a.desktop !== undefined && a.available)
+  .sort((a, b) => (a.desktop ?? 99) - (b.desktop ?? 99));
 
 export const launchableApps = Object.values(APPS).filter((a) => a.available && a.id !== "project");

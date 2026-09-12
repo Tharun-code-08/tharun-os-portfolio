@@ -3,6 +3,9 @@
 /**
  * The desktop wallpaper: a room, drawn as original pixel art.
  *
+ * The character is NOT in here — it lives in TharunBot.tsx so behaviour and
+ * scenery can change independently.
+ *
  * Everything here is plain <rect>s on a 320x180 grid with shape-rendering
  * crispEdges, so it scales up chunky instead of blurry — no image assets, no
  * sprite sheets, nothing copied from anyone else's site.
@@ -199,60 +202,6 @@ export function Scene({ className = "" }: { className?: string }) {
         <rect x="190" y="132" width="24" height="48" fill="#ffd9a0" />
         <rect x="222" y="132" width="18" height="48" fill="#ffd9a0" />
       </g>
-
-      <Character x={272} y={78} />
     </svg>
-  );
-}
-
-/**
- * A stylised pixel figure, not a portrait — I have never seen a photo of you.
- * Swap it for a real pixel avatar by replacing this component with an <image>.
- */
-export function Character({ x, y }: { x: number; y: number }) {
-  const skin = "#c98c5e";
-  const skinDark = "#ab7249";
-  const hair = "#241a14";
-  const shirt = "#b83b34";
-  const shirtDark = "#932c27";
-  const pants = "#39405a";
-  const shoe = "#ece7de";
-
-  const parts: R[] = [
-    // head
-    [6, 0, 12, 11, skin],
-    [5, -1, 14, 5, hair],
-    [4, 2, 2, 5, hair],
-    [18, 2, 2, 5, hair],
-    [8, 5, 3, 2, "#1c1c22"],
-    [13, 5, 3, 2, "#1c1c22"],
-    [7, 5, 10, 1, "#1c1c22"],
-    // neck + torso
-    [10, 11, 4, 3, skinDark],
-    [4, 14, 16, 20, shirt],
-    [4, 14, 4, 20, shirtDark],
-    [17, 14, 3, 20, shirtDark],
-    // arms folded
-    [2, 20, 20, 5, shirt],
-    [3, 22, 18, 3, shirtDark],
-    [2, 21, 5, 4, skin],
-    [17, 21, 5, 4, skin],
-    // legs
-    [5, 34, 6, 22, pants],
-    [13, 34, 6, 22, pants],
-    [5, 34, 14, 3, "#2c3247"],
-    // shoes
-    [3, 56, 9, 4, shoe],
-    [12, 56, 9, 4, shoe],
-    // shadow
-    [1, 60, 22, 2, "#00000033"],
-  ];
-
-  return (
-    <g transform={`translate(${x} ${y})`}>
-      {parts.map(([px, py, w, h, fill], i) => (
-        <rect key={i} x={px} y={py} width={w} height={h} fill={fill} />
-      ))}
-    </g>
   );
 }

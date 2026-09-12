@@ -5,10 +5,12 @@ import { profile } from "@/data/profile";
 import { buildLog } from "@/data/journal";
 import { now } from "@/data/profile";
 import { sites } from "@/data/sites";
-import { launchableApps } from "@/lib/apps";
+import { desktopApps } from "@/lib/apps";
+import { botSay } from "@/lib/bot";
 import { useOs } from "@/lib/os";
 import { Icon } from "./Icon";
 import { Scene } from "./Scene";
+import { TharunBot } from "./TharunBot";
 
 export function Desktop() {
   const os = useOs();
@@ -44,16 +46,17 @@ export function Desktop() {
             </header>
 
             <ul
-              className="animate-fade-up grid grid-cols-3 gap-x-2 gap-y-1 sm:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6"
+              className="animate-fade-up grid max-w-md grid-cols-4 gap-x-1 gap-y-1"
               style={{ animationDelay: "120ms" }}
             >
-              {launchableApps.map((app) => (
+              {desktopApps.map((app) => (
                 <li key={app.id}>
                   <DesktopIcon
                     label={app.label}
                     hint={app.hint}
                     icon={app.icon}
                     onOpen={() => os.open(app.id)}
+                    onHover={() => botSay(`hover:${app.id}`)}
                   />
                 </li>
               ))}
@@ -63,7 +66,11 @@ export function Desktop() {
               className="animate-fade-up mt-6 font-mono text-[9.5px] tracking-[0.18em] text-ink/45"
               style={{ animationDelay: "260ms" }}
             >
-              DOUBLE-CLICK TO OPEN · ⌘K TO SEARCH · RIGHT-CLICK THE ROOM · R FOR RECRUITER MODE
+              DOUBLE-CLICK TO OPEN · ⌘K TO SEARCH · R FOR RECRUITER MODE
+              <br />
+              <span className="text-ink/30">
+                BROWSER, TERMINAL AND SETTINGS LIVE IN THE DOCK
+              </span>
             </p>
           </div>
         </div>
@@ -124,6 +131,8 @@ export function Desktop() {
           </div>
         </aside>
       ) : null}
+
+      <TharunBot />
     </>
   );
 }
@@ -133,11 +142,13 @@ function DesktopIcon({
   hint,
   icon,
   onOpen,
+  onHover,
 }: {
   label: string;
   hint: string;
   icon: Parameters<typeof Icon>[0]["name"];
   onOpen: () => void;
+  onHover: () => void;
 }) {
   const [selected, setSelected] = useState(false);
 
@@ -146,6 +157,7 @@ function DesktopIcon({
       type="button"
       onClick={() => setSelected(true)}
       onDoubleClick={onOpen}
+      onPointerEnter={onHover}
       onBlur={() => setSelected(false)}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {

@@ -57,6 +57,26 @@ want a real pixel avatar of yourself.
 
 Desktop icons sit on top in a grid: single click selects, double click opens.
 
+## TharunBOT
+
+The character is a behaviour engine, not decoration — [`src/lib/bot.ts`](src/lib/bot.ts) holds a
+data-driven line table, and [`TharunBot.tsx`](src/components/os/TharunBot.tsx) draws it.
+
+Lines are matched on events (`open:lab`, `hover:work`, `idle`, `enter`, `return`), and the rules
+are what keep it from being irritating:
+
+- one bubble at a time, highest priority wins
+- a reaction always beats ambient chatter
+- ambient lines fire every ~32s at most and never repeat back to back
+- `once` lines fire a single time per session
+- `prefers-reduced-motion` silences ambient lines and the cursor tracking entirely
+
+It also escalates. Open three different apps and the `explorer` flag unlocks a second tier of
+lines — the Lab stops saying "these are unresolved questions" and starts saying "you're actually
+reading this". First-time visitors get a greeting; returning ones just get "Welcome back."
+
+Adding dialogue means adding an object to `LINES`. Nothing else changes.
+
 ## The browser
 
 `BROWSER` in the dock opens an in-OS browser with back / forward / reload, an address bar and

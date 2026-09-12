@@ -9,7 +9,8 @@ import {
   useReducer,
   type ReactNode,
 } from "react";
-import { APPS, type AppId } from "./apps";
+import { APPS, type AppId } from "@/lib/apps";
+import { botSay, markOpened } from "@/lib/bot";
 
 export type WinRect = { x: number; y: number; w: number; h: number };
 
@@ -246,11 +247,12 @@ export function OsProvider({ children }: { children: ReactNode }) {
     }
   }, [state]);
 
-  const open = useCallback(
-    (appId: AppId, payload?: string, title?: string) =>
-      dispatch({ type: "open", appId, payload, title, viewport: viewport() }),
-    [],
-  );
+  const open = useCallback((appId: AppId, payload?: string, title?: string) => {
+    dispatch({ type: "open", appId, payload, title, viewport: viewport() });
+    // Let the character react to what the visitor just did.
+    markOpened(appId);
+    botSay(`open:${appId}`);
+  }, []);
 
   const api = useMemo<OsApi>(
     () => ({
