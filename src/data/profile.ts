@@ -16,15 +16,19 @@ export const profile = {
   tagline: "Still building.",
   headline: ["I build products,", "not just projects."],
 
-  /** Shown under the headline. Keep it to two sentences. */
+  /** Shown under the headline. Keep it to two or three sentences. */
   intro:
-    "I'm a second-year CS undergrad who went straight into industry. I lead development on Softventory, an enterprise inventory management SaaS that's in production — full stack, real tenants, real deployments.",
+    "I'm a second-year CS undergrad already working in industry. I led development on Softventory, an enterprise inventory SaaS running in production, and I'm now building BrandThis at Claxon AI. Along the way I wrote my own browser IDE and spent two months building for headsets.",
 
   /** The status line in the menu bar and hero. Update it when the work changes. */
   status: {
     state: "BUILDING" as const,
-    what: "multi-tenant architecture for Softventory",
+    what: "BrandThis at Claxon AI",
   },
+
+  /** The summary paragraph at the top of Recruiter Mode. Keep it to one block. */
+  resumeSummary:
+    "Second-year Computer Science undergraduate already working in industry. Led development of Softventory, an enterprise inventory management SaaS running in production, and now builds BrandThis at Claxon AI. Hands-on across the full stack — TypeScript, React/Next.js, NestJS and PostgreSQL — with experience designing multi-tenant architecture and owning real deployments, plus work outside the web stack: a browser-based polyglot IDE and two months of AR/VR/XR development.",
 
   os: {
     name: "THARUN OS",
@@ -44,6 +48,8 @@ export const contact = {
   linkedinHandle: "in/tharuncode",
   /** Drop a PDF at public/resume.pdf and change this to "/resume.pdf". */
   resume: "/Tharun_Adhithya_Resume.docx",
+  /** TODO (Tharun): add your LeetCode handle and this appears in PROOF and ⌘K. */
+  leetcode: null as string | null,
 };
 
 export type StackGroup = {
@@ -57,10 +63,11 @@ export const stack: StackGroup[] = [
     label: "Languages",
     items: [
       { name: "TypeScript", note: "Daily driver. Frontend and backend, end to end." },
-      { name: "JavaScript", note: "Where it started. Still what everything compiles down to." },
-      { name: "Java", note: "Coursework and a Library Management System built from scratch." },
+      { name: "JavaScript", note: "Where it started, and what my browser IDE is written in." },
+      { name: "Java", note: "Coursework, a Library Management System from scratch, and most of my DSA practice." },
       { name: "Python", note: "Scripts, automation, one-off data work." },
       { name: "C", note: "Systems fundamentals — memory, pointers, how it actually works." },
+      { name: "SQL", note: "Schema design and the queries underneath every product I have shipped." },
       { name: "HTML / CSS", note: "Hand-written more often than people assume." },
     ],
   },
@@ -69,7 +76,7 @@ export const stack: StackGroup[] = [
     items: [
       { name: "React", note: "Every production UI I've shipped." },
       { name: "Next.js", note: "App Router, server components, deployed on Vercel." },
-      { name: "Tailwind CSS", note: "Design system for Softventory's entire interface." },
+      { name: "Tailwind CSS", note: "Design system for Softventory's interface, and for this site." },
     ],
   },
   {
@@ -91,12 +98,34 @@ export const stack: StackGroup[] = [
     ],
   },
   {
+    label: "AI",
+    items: [
+      { name: "LLM APIs", note: "BrandThis runs on them — the work is in the context you give a model, not the call." },
+      {
+        name: "Agent workflows",
+        note: "Claxon builds agents that finish a task rather than recommend one. Different discipline to prompting.",
+      },
+    ],
+  },
+  {
+    label: "Immersive",
+    items: [
+      // TODO (Tharun): name the engine and SDK you used at Ingage — Unity, Unreal,
+      // WebXR, ARCore, ARKit — and I'll split these into proper entries.
+      {
+        name: "AR / VR / XR",
+        note: "Two months building immersive experiences during an internship at Ingage.",
+      },
+    ],
+  },
+  {
     label: "Infrastructure",
     items: [
-      { name: "Docker", note: "Backend runs containerised on a self-hosted VPS." },
-      { name: "GitHub Actions", note: "CI pipelines I own — build, check, deploy." },
+      { name: "Docker", note: "Backend ran containerised on a self-hosted VPS." },
+      { name: "GitHub Actions", note: "CI pipelines I owned — build, check, deploy." },
       { name: "Vercel", note: "Frontend deployments and preview environments." },
       { name: "Linux (VPS)", note: "Self-hosted Postgres, backups, recovery drills." },
+      { name: "WebAssembly", note: "How Mini Playground runs Python and SQLite with no backend." },
       { name: "Git", note: "Branches, reviews, and a readable history." },
     ],
   },
@@ -106,16 +135,15 @@ export const now = {
   /** Update this date whenever you rewrite the section below. */
   updated: "September 2026",
   building: [
-    "A multi-tenant SaaS redesign of Softventory — row-level security for tenant isolation, an append-only stock movement ledger, and an outbox-based domain event catalog.",
-    "A multi-tier backup and recovery system for self-hosted PostgreSQL, because a backup you have never restored is not a backup.",
+    "BrandThis at Claxon AI — turning a company's website into a Brand DNA that generative tools can actually work from, so output comes back on-brand rather than merely on-topic.",
   ],
   learning: [
-    "How multi-tenancy actually fails — noisy neighbours, leaked rows, migrations across tenants.",
-    "Event-driven patterns: outbox, idempotency, and what 'exactly once' really costs.",
-    "Database operations: WAL, point-in-time recovery, and restore rehearsals.",
+    "Data structures and algorithms, properly rather than for a test — working through LeetCode most days.",
+    "Where the fundamentals I skipped show up in production code I have already written.",
   ],
   thinkingAbout: [
+    "Why a year of shipping features taught me less about complexity than a month of DSA has.",
+    "How much context an AI actually needs before its output stops being generic.",
     "Why most inventory software is hated by the people who have to use it every day.",
-    "How much architecture a two-year-old product actually deserves.",
   ],
 };

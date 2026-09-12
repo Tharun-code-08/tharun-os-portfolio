@@ -21,24 +21,30 @@ export type LogEntry = {
 };
 
 /**
- * Dates below come from your resume and from public activity on
+ * Dates here come from your resume and from public activity on
  * github.com/Tharun-code-08 — they are last-activity dates, not start dates.
  * Rewrite any line that misremembers how it actually went.
+ *
+ * TODO (Tharun): two entries are missing because I do not know their dates,
+ * and a portfolio with an invented date on it is worse than one with a gap:
+ *   - START  — the month you joined Claxon AI
+ *   - START  — the two months of the Ingage AR/VR/XR internship
+ * Add them in the same shape as the lines below and they slot into the timeline.
  */
 export const buildLog: LogEntry[] = [
   {
-    date: "2026-09-11",
-    kind: "SHIP",
-    title: "Hilook Interiors went live",
-    detail: "Interior design studio site, built and deployed on Vercel.",
-    href: "https://hilook-interiors.vercel.app",
+    date: "2026-09-12",
+    kind: "BUILD",
+    title: "Building BrandThis at Claxon AI",
+    detail:
+      "Brand intelligence for generative work — read a company's website, turn it into a Brand DNA, keep everything generated afterwards on-brand.",
+    href: "https://brandthis.in",
   },
   {
-    date: "2026-08-09",
-    kind: "BUILD",
-    title: "Inventory Control for retail",
-    detail: "The smaller retail-facing take on inventory, separate from the enterprise product.",
-    href: "https://github.com/Tharun-code-08/Inventory-control",
+    date: "2026-09-01",
+    kind: "LEARN",
+    title: "Started taking DSA seriously",
+    detail: "Working through LeetCode most days. A year of shipping features exposed the gaps.",
   },
   {
     date: "2026-07-22",
@@ -62,6 +68,14 @@ export const buildLog: LogEntry[] = [
     href: "https://github.com/Tharun-code-08/Testing-IMS",
   },
   {
+    date: "2026-04-25",
+    kind: "BUILD",
+    title: "Wrote my own IDE",
+    detail:
+      "Mini Playground — ten-plus languages running in the browser, Python on WebAssembly and SQLite compiled to the client.",
+    href: "https://github.com/Tharun-code-08/MY-IDLE",
+  },
+  {
     date: "2026-04-17",
     kind: "BUILD",
     title: "IMS backend groundwork",
@@ -73,7 +87,7 @@ export const buildLog: LogEntry[] = [
     kind: "SHIP",
     title: "Softdigit Consulting site",
     detail: "Company site, live on Vercel.",
-    href: "https://soft-digits-consulting.vercel.app",
+    href: "https://softdigitconsulting.com/",
   },
   {
     date: "2026-02-21",
@@ -90,17 +104,17 @@ export const buildLog: LogEntry[] = [
     href: "https://softdigitconsulting.com/",
   },
   {
+    date: "2025-08-01",
+    kind: "START",
+    title: "Started B.E. Computer Science at Sathyabama",
+    detail: "Chennai. Class of 2029.",
+  },
+  {
     date: "2025-06-05",
     kind: "START",
     title: "Started pushing code in public",
     detail: "First commits on GitHub.",
     href: "https://github.com/Tharun-code-08",
-  },
-  {
-    date: "2025-08-01",
-    kind: "START",
-    title: "Started B.E. Computer Science at Sathyabama",
-    detail: "Chennai. Class of 2029.",
   },
 ];
 
@@ -118,59 +132,70 @@ export type LabEntry = {
 
 /**
  * Real questions from the work, not invented demos.
- * Add one whenever something at work makes you go "wait, how does that actually work".
+ * Add one whenever something makes you go "wait, how does that actually work".
  */
 export const lab: LabEntry[] = [
   {
-    id: "rls-isolation",
+    id: "brand-context",
     index: "001",
+    question: "How much context does a model need before its output stops being generic?",
+    context:
+      "Every generative tool is good at on-topic and bad at on-brand. Re-explaining a brand in each prompt does not hold, and the drift compounds across a campaign.",
+    approach:
+      "Extract the brand once — colour system, typography, voice — from the artefact that already encodes it, the company's own website, and make that a reusable object rather than a paragraph someone retypes.",
+    status: "ONGOING",
+  },
+  {
+    id: "rls-isolation",
+    index: "002",
     question: "Can row-level security alone be trusted to keep tenants apart?",
     context:
-      "Softventory is moving to multi-tenant. The cheap version is a tenant_id column and discipline. Discipline fails eventually.",
+      "The cheap version of multi-tenancy is a tenant_id column and discipline. Discipline fails eventually.",
     approach:
       "Push isolation into PostgreSQL with row-level security so a missing WHERE clause returns nothing instead of everything, and treat the application layer as a convenience rather than the boundary.",
     status: "ONGOING",
   },
   {
     id: "append-only-ledger",
-    index: "002",
+    index: "003",
     question: "Should stock quantity be a column, or something you derive?",
     context:
       "A mutable quantity column is fast and lies quietly. When two operations race, you find out days later from a stock count.",
     approach:
       "Model stock as an append-only movement ledger and derive the on-hand figure, so every number on screen has a trail behind it.",
-    status: "ONGOING",
+    status: "ANSWERED",
+    result: "Went into the Softventory multi-tenant redesign.",
   },
   {
     id: "outbox-escalation",
-    index: "003",
+    index: "004",
     question: "How do you make sure an alert nobody reads still reaches someone?",
-    context:
-      "Low-stock and expiry notifications are worthless if they land in an inbox that is never opened.",
+    context: "Low-stock and expiry notifications are worthless if they land in an inbox that is never opened.",
     approach:
       "A configurable escalation engine on top of the outbox pattern — the notification is written in the same transaction as the event, then climbs the chain until someone acknowledges it.",
     status: "ANSWERED",
-    result: "Shipped into the product. Alerts now escalate rather than expire.",
+    result: "Shipped into the product. Alerts escalate rather than expire.",
   },
   {
-    id: "fefo",
-    index: "004",
-    question: "What does FEFO cost you when the shelf disagrees with the database?",
+    id: "wasm-runtimes",
+    index: "005",
+    question: "What actually has to happen for Python to run in a browser tab?",
     context:
-      "First-expiring-first-out is obvious on paper. On a warehouse floor, the nearest pallet wins.",
+      "Browser playgrounds stop at the web stack. The moment you want Python or SQL you are back to a server round-trip.",
     approach:
-      "Allocate by expiry automatically and make the picking flow show why a specific batch was chosen, so the rule is visible instead of arbitrary.",
+      "Pyodide for Python and sql.js for SQLite, both compiled to WebAssembly, behind one interface — and being honest that C, C++ and Java still go out to a compiler API.",
     status: "ANSWERED",
-    result: "In production as part of batch-lot tracking.",
+    result: "Mini Playground runs ten-plus languages with no backend.",
   },
   {
     id: "restore-drill",
-    index: "005",
+    index: "006",
     question: "Is a backup you have never restored actually a backup?",
     context: "Self-hosted PostgreSQL on a VPS. No managed service quietly handling this.",
     approach:
       "A multi-tier backup design, and rehearsing the restore rather than trusting the job that writes the file.",
-    status: "ONGOING",
+    status: "ANSWERED",
+    result: "Multi-tier backup and recovery designed and in place.",
   },
 ];
 
@@ -215,8 +240,8 @@ export type Note = {
  * TODO (Tharun): short technical notes. 200 words is plenty.
  * Good first ones, based on what you already do every day:
  *   - "What row-level security does not protect you from"
+ *   - "Running Python in a browser tab: what Pyodide actually costs"
  *   - "Why I chose a modular monolith over microservices"
- *   - "Restoring a Postgres backup before you need to"
  * Add one and NOTES appears in the dock.
  */
 export const notes: Note[] = [];

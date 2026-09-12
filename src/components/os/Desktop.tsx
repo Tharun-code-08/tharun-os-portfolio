@@ -8,7 +8,9 @@ import { Icon } from "./Icon";
 
 export function Desktop() {
   const os = useOs();
-  const latestShip = buildLog.find((e) => e.kind === "SHIP");
+  // Newest entry of any kind, so this card cannot go stale just because the
+  // most recent milestone happened to not be a launch.
+  const latest = [...buildLog].sort((a, b) => b.date.localeCompare(a.date))[0];
   const lead = publishedProjects[0];
 
   return (
@@ -58,14 +60,18 @@ export function Desktop() {
           <Card
             label="Currently building"
             value={lead?.name ?? "—"}
-            note={profile.status.what}
+            note={lead?.kind ?? ""}
             live
             onClick={() => os.open("project", lead.id, lead.name)}
           />
           <Card
-            label="Last shipped"
-            value={latestShip?.title ?? "—"}
-            note={latestShip ? new Date(latestShip.date).toLocaleDateString("en-GB", { month: "long", year: "numeric" }) : ""}
+            label="Latest"
+            value={latest?.title ?? "—"}
+            note={
+              latest
+                ? new Date(latest.date).toLocaleDateString("en-GB", { month: "long", year: "numeric" })
+                : ""
+            }
             onClick={() => os.open("log")}
           />
           <Card

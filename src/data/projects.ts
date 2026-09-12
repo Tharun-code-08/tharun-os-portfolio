@@ -22,13 +22,54 @@ export type Project = {
 
 export const projects: Project[] = [
   {
-    id: "softventory",
+    id: "brandthis",
     index: "01",
+    name: "BrandThis",
+    kind: "AI SaaS · live",
+    summary:
+      "Feed it a website once and it builds a reusable Brand DNA — colour system, typography, voice — so everything generated afterwards comes out on-brand instead of merely on-topic.",
+    status: "building",
+    period: "2026 — present",
+    // TODO (Tharun): sharpen this to what you specifically own on the product.
+    role: "Currently building it",
+    tech: ["TypeScript", "Next.js", "React", "Tailwind CSS", "LLM APIs"],
+    links: [
+      { label: "brandthis.in", href: "https://brandthis.in" },
+      { label: "claxonai.in", href: "https://claxonai.in" },
+    ],
+    published: true,
+    study: [
+      {
+        heading: "The problem",
+        body: [
+          "Generative tools are good at on-topic and bad at on-brand. Every new campaign starts by re-explaining the same brand to the same model, and the output drifts a little further each time.",
+          "The brand already exists — it is sitting on the company website. Nobody was reading it back out in a form a model could use.",
+        ],
+      },
+      {
+        heading: "What it does",
+        body: [
+          "You paste a website or an Instagram URL. BrandThis reads the visual, verbal and strategic signals behind it and turns them into a Brand DNA: a core colour system, typography and a voice direction held together as one working system.",
+          "That becomes reusable creative context. Teams generate ads, posts and product visuals from the same identity instead of restating the brief at every handoff.",
+        ],
+      },
+      {
+        heading: "Where it sits",
+        body: [
+          "BrandThis is the first standalone product out of the Claxon AI ecosystem — the same company building an agent runtime that connects models, data and existing tools.",
+          "Different shape of problem, same underlying idea: give the AI real context about the business before asking it to do anything.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "softventory",
+    index: "02",
     name: "Softventory",
     kind: "Enterprise SaaS · production",
     summary:
       "An inventory control and management system used by real businesses to track stock across plants, batches and expiry dates.",
-    status: "building",
+    status: "shipped",
     period: "Jan 2026 — present",
     role: "Lead developer",
     tech: [
@@ -66,45 +107,65 @@ export const projects: Project[] = [
         heading: "The architecture decision",
         body: [
           "The backend is a NestJS modular monolith, not microservices. A product this age does not have the operational budget for a distributed system, and module boundaries give most of the separation without putting a network in the middle of it.",
-          "I am now driving a multi-tenant redesign: PostgreSQL row-level security for tenant isolation, an append-only stock movement ledger so quantity is derived rather than mutated, and an outbox-based domain event catalog so integrations read events instead of polling tables.",
+          "The multi-tenant redesign covered PostgreSQL row-level security for tenant isolation, an append-only stock movement ledger so quantity is derived rather than mutated, and an outbox-based domain event catalog so integrations read events instead of polling tables.",
         ],
       },
       {
         heading: "The part that is not glamorous",
         body: [
           "I designed a multi-tier backup and recovery system for a self-hosted PostgreSQL deployment on a VPS.",
-          "It is the least visible work in the product and the reason I sleep. A backup you have never restored is a guess.",
+          "It is the least visible work in the product and the reason I slept. A backup you have never restored is a guess.",
         ],
       },
       {
-        heading: "What I own beyond the code",
+        heading: "What I owned beyond the code",
         body: [
-          "Deployment and CI are mine: Vercel for the frontend, Docker on a VPS for the backend, GitHub Actions tying it together.",
+          "Deployment and CI were mine: Vercel for the frontend, Docker on a VPS for the backend, GitHub Actions tying it together.",
           "Owning the deploy changed how I write code. You design differently when you are the one awake if it breaks.",
         ],
       },
     ],
   },
   {
-    id: "hilook-interiors",
-    index: "02",
-    name: "Hilook Interiors",
-    kind: "Client site · live",
-    summary: "A marketing site for an interior design studio, built to load fast and read well on a phone.",
+    id: "mini-playground",
+    index: "03",
+    name: "Mini Playground",
+    kind: "Browser IDE · built from scratch",
+    summary:
+      "A polyglot IDE that runs entirely in the browser — ten-plus languages, including Python, C/C++, Java and SQL, with no backend and no install.",
     status: "shipped",
     period: "2026",
-    role: "Built and deployed it",
-    tech: ["TypeScript", "Next.js", "Tailwind CSS", "Vercel"],
-    links: [
-      { label: "hilook-interiors.vercel.app", href: "https://hilook-interiors.vercel.app" },
-      { label: "Source", href: "https://github.com/Tharun-code-08/hilook-interiors" },
-    ],
+    role: "Solo",
+    tech: ["JavaScript", "Vite", "WebAssembly", "Pyodide", "sql.js", "Babel"],
+    links: [{ label: "Source", href: "https://github.com/Tharun-code-08/MY-IDLE" }],
     published: true,
-    study: [],
+    study: [
+      {
+        heading: "Why build an IDE",
+        body: [
+          "Browser playgrounds are everywhere, but they mostly stop at the web stack. The moment you want to run Python or compile C, you are back to a local toolchain or a server round-trip.",
+          "I wanted to know what it actually takes to run a compiled language in a tab.",
+        ],
+      },
+      {
+        heading: "How it runs ten languages with no backend",
+        body: [
+          "HTML, CSS, JavaScript and TypeScript render in a live iframe; React, Vue and Svelte compile in-browser through Babel and each framework's own compiler.",
+          "Python runs on Pyodide compiled to WebAssembly. SQL runs on sql.js, SQLite built for the browser, with real query results in an interactive table.",
+          "C, C++ and Java are the honest compromise — those go out to compiler APIs rather than pretending to run locally.",
+        ],
+      },
+      {
+        heading: "What it taught me",
+        body: [
+          "That the interesting constraint was never the editor. It was making ten wildly different execution models present the same interface to someone who just wants to press Run.",
+        ],
+      },
+    ],
   },
   {
     id: "inventory-control",
-    index: "03",
+    index: "04",
     name: "Inventory Control",
     kind: "Product · retail",
     summary: "An inventory control app aimed at retail shops — the smaller, sharper cousin of the enterprise system.",
@@ -121,16 +182,16 @@ export const projects: Project[] = [
   },
   {
     id: "softdigit-site",
-    index: "04",
+    index: "05",
     name: "Softdigit Consulting",
     kind: "Company site · live",
-    summary: "The company's public site — the front door for the product I work on every day.",
+    summary: "The company's public site — the front door for the product I led development on.",
     status: "shipped",
     period: "2026",
     role: "Built it",
     tech: ["TypeScript", "Next.js", "Vercel"],
     links: [
-      { label: "soft-digits-consulting.vercel.app", href: "https://soft-digits-consulting.vercel.app" },
+      { label: "softdigitconsulting.com", href: "https://softdigitconsulting.com/" },
       { label: "Source", href: "https://github.com/Tharun-code-08/SoftDigitsConsulting" },
     ],
     published: true,
@@ -138,7 +199,7 @@ export const projects: Project[] = [
   },
   {
     id: "library-management",
-    index: "05",
+    index: "06",
     name: "Library Management System",
     kind: "Java · from scratch",
     summary:
@@ -153,7 +214,7 @@ export const projects: Project[] = [
   },
   {
     id: "ims-backend",
-    index: "06",
+    index: "07",
     name: "IMS Backend",
     kind: "Backend · groundwork",
     summary: "The early backend work that became the foundation for how I think about inventory data.",
@@ -167,21 +228,22 @@ export const projects: Project[] = [
   },
 
   // ---------------------------------------------------------------------------
-  // TODO (Tharun): Claxon AI. You own claxonai.in, but I have no verified details
-  // about it and did not want to invent any. Fill in summary / role / tech / study,
-  // then flip `published` to true and it shows up in WORK, in ⌘K and in the terminal.
+  // TODO (Tharun): your AR/VR/XR work at Ingage. You told me it happened but not
+  // what you built, so I have not written it — fill in summary / tech / study and
+  // flip `published` to true. It is the most differentiated thing on this list:
+  // almost no backend-leaning developer also has headset experience.
   // ---------------------------------------------------------------------------
   {
-    id: "claxon-ai",
-    index: "07",
-    name: "Claxon AI",
-    kind: "Product",
-    summary: "TODO: one line on what Claxon AI actually is.",
-    status: "building",
-    period: "2026 — present",
-    role: "TODO",
+    id: "xr-ingage",
+    index: "08",
+    name: "XR work at Ingage",
+    kind: "AR / VR / XR",
+    summary: "TODO: what you actually built during the internship.",
+    status: "archived",
+    period: "TODO",
+    role: "Intern",
     tech: [],
-    links: [{ label: "claxonai.in", href: "https://claxonai.in" }],
+    links: [],
     published: false,
     study: [],
   },
@@ -189,7 +251,34 @@ export const projects: Project[] = [
 
 export const publishedProjects = projects.filter((p) => p.published);
 
-export const experience = [
+export type Job = {
+  company: string;
+  role: string;
+  period: string;
+  location: string;
+  href?: string;
+  product?: string;
+  points: string[];
+  /** False keeps it out of the site until the details are right. */
+  published: boolean;
+};
+
+export const experience: Job[] = [
+  {
+    company: "Claxon AI",
+    role: "Software Development Intern",
+    // TODO (Tharun): real start month.
+    period: "2026 — Present",
+    location: "Chennai, India",
+    href: "https://claxonai.in",
+    product: "BrandThis — brand intelligence for generative work",
+    points: [
+      "Building BrandThis, the first standalone product out of the Claxon AI ecosystem: it reads a company's website and turns the visual, verbal and strategic signals behind it into a reusable Brand DNA.",
+      "Work spans the product surface — brand scanning, the workspace where a team's identity lives, and the generation flow that keeps ads, posts and product visuals on-brand across channels.",
+      "Claxon itself builds an agent runtime that connects models, data and existing tools so an agent finishes a task rather than recommending one; BrandThis applies the same idea to creative work.",
+    ],
+    published: true,
+  },
   {
     company: "Softdigit Consulting",
     role: "Software Developer",
@@ -200,12 +289,26 @@ export const experience = [
     points: [
       "Lead developer on an enterprise inventory management SaaS built with React, Next.js, TypeScript and Tailwind CSS on the frontend, and a NestJS modular monolith with PostgreSQL, Prisma and Redis on the backend.",
       "Shipped core product features: bulk product uploads with plant-level assignment, expiry and batch-lot tracking with FEFO allocation, a drag-and-drop stock transfer workflow generating Stock Transfer Orders, and a configurable notification escalation engine built on an outbox pattern.",
-      "Driving a multi-tenant SaaS architecture redesign covering PostgreSQL row-level security for tenant isolation, an append-only stock movement ledger, and an outbox-based domain event catalog.",
+      "Drove a multi-tenant SaaS architecture redesign covering PostgreSQL row-level security for tenant isolation, an append-only stock movement ledger, and an outbox-based domain event catalog.",
       "Designed a multi-tier database backup and recovery system for a self-hosted PostgreSQL deployment on a VPS.",
-      "Own deployment and CI: Vercel (frontend), Docker on VPS (backend), and GitHub Actions pipelines.",
+      "Owned deployment and CI: Vercel (frontend), Docker on VPS (backend), and GitHub Actions pipelines.",
     ],
+    published: true,
+  },
+  {
+    company: "Ingage",
+    role: "AR/VR & XR Development Intern",
+    // TODO (Tharun): the two months this ran, and two or three real bullets about
+    // what you built. Then set published: true.
+    period: "TODO — 2 months",
+    location: "Chennai, India",
+    product: "Immersive / XR development",
+    points: [],
+    published: false,
   },
 ];
+
+export const publishedExperience = experience.filter((j) => j.published);
 
 export const education = [
   {

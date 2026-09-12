@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { contact, profile, stack } from "@/data/profile";
-import { education, experience, publishedProjects } from "@/data/projects";
+import { education, publishedExperience, publishedProjects } from "@/data/projects";
 import { Icon } from "../os/Icon";
 
 /**
@@ -74,17 +74,11 @@ export function RecruiterMode({ onClose }: { onClose: () => void }) {
         </header>
 
         <Section title="Summary">
-          <p className="text-[13.5px] leading-relaxed text-muted">
-            Second-year Computer Science undergraduate working in industry as a software developer,
-            leading development of an enterprise inventory management product in production.
-            Hands-on across the full stack — TypeScript, React/Next.js, NestJS and PostgreSQL — with
-            experience shipping features, designing multi-tenant architecture, and managing real
-            deployments.
-          </p>
+          <p className="text-[13.5px] leading-relaxed text-muted">{profile.resumeSummary}</p>
         </Section>
 
         <Section title="Experience">
-          {experience.map((job) => (
+          {publishedExperience.map((job) => (
             <article key={job.company} className="mb-8 last:mb-0">
               <div className="mb-1 flex flex-wrap items-baseline justify-between gap-x-4">
                 <h3 className="text-[15px] font-medium text-ink">

@@ -52,6 +52,7 @@ export function ProofApp() {
         <div className="flex flex-wrap gap-2">
           <ProofLink href={contact.github} label="GitHub" />
           <ProofLink href={contact.linkedin} label="LinkedIn" />
+          {contact.leetcode ? <ProofLink href={contact.leetcode} label="LeetCode" /> : null}
           <ProofLink href={contact.resume} label="Resume" download />
         </div>
       </section>

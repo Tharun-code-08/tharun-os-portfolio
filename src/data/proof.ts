@@ -16,9 +16,13 @@ export function monthsShipping(from: Date = new Date()): number {
 }
 
 export const liveDeployments = [
+  { label: "BrandThis", href: "https://brandthis.in", note: "Brand intelligence SaaS" },
   { label: "Softventory", href: "https://softdigitconsulting.com/", note: "Enterprise SaaS, in production" },
-  { label: "Hilook Interiors", href: "https://hilook-interiors.vercel.app", note: "Client site" },
-  { label: "Softdigit Consulting", href: "https://soft-digits-consulting.vercel.app", note: "Company site" },
+  {
+    label: "Softdigit Consulting",
+    href: "https://soft-digits-consulting.vercel.app",
+    note: "Company site",
+  },
 ];
 
 export function proofStats(now: Date = new Date()) {
@@ -26,22 +30,22 @@ export function proofStats(now: Date = new Date()) {
     {
       value: String(monthsShipping(now)),
       label: "months in industry",
-      note: "Software Developer at Softdigit Consulting since January 2026.",
+      note: "Writing production software since January 2026, from the second year of a CS degree.",
     },
     {
-      value: "1",
-      label: "product in production",
-      note: "Softventory, an enterprise inventory SaaS with real businesses using it.",
+      value: "2",
+      label: "products in production",
+      note: "Softventory, an enterprise inventory SaaS, and BrandThis, live at brandthis.in.",
     },
     {
-      value: String(liveDeployments.length),
-      label: "live deployments",
-      note: "Sites and products you can open right now.",
+      value: "10+",
+      label: "languages in my IDE",
+      note: "Mini Playground runs them in the browser — Python on WebAssembly, SQLite compiled to the client.",
     },
     {
       value: String(publishedProjects.length),
       label: "projects published here",
-      note: "Everything on this site links to source or to a live URL.",
+      note: "Every one links to source or to a live URL.",
     },
     {
       value: "10",
