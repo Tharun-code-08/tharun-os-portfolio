@@ -45,6 +45,28 @@ the documentation cannot drift from the handler.
 Terminal commands: `help`, `apps`, `open <app>`, `projects`, `skills`, `whoami`, `neofetch`,
 `api`, `theme`, `github`, `linkedin`, `email`, `resume`, `clear`. Two are not in `help`.
 
+## The room
+
+The wallpaper is a room — desk, CRT, sunset window, plant, and a figure at the right — drawn as
+original pixel art in [`Scene.tsx`](src/components/os/Scene.tsx). It is plain `<rect>`s on a
+320×180 grid with `shape-rendering: crispEdges`, so it scales up chunky rather than blurry. No
+image files, no sprite sheets, nothing traced from anyone else's site.
+
+The figure is a **stylised character, not a portrait** — swap `Character` for an `<image>` if you
+want a real pixel avatar of yourself.
+
+Desktop icons sit on top in a grid: single click selects, double click opens.
+
+## The browser
+
+`BROWSER` in the dock opens an in-OS browser with back / forward / reload, an address bar and
+bookmarks for **Claxon AI**, **BrandThis** and **Softdigit Consulting** — all three verified to
+load inside a frame. Sites are listed in [`src/data/sites.ts`](src/data/sites.ts).
+
+A cross-origin frame cannot be inspected, so a blocked site looks identical to a slow one. After
+six seconds the browser offers a real tab instead of leaving a white rectangle. GitHub and
+LinkedIn both send `X-Frame-Options`, which is why they are not bookmarked.
+
 ## The OS layer
 
 Drag a window to a screen edge and it snaps, with a translucent panel previewing where it lands.

@@ -1,68 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { APPS, type AppId } from "@/lib/apps";
+import { useEffect } from "react";
 import { useOs } from "@/lib/os";
 import { setTheme, useTheme } from "@/lib/theme";
-import { Icon } from "./Icon";
-
-const DESKTOP_ICONS: AppId[] = ["work", "lab", "notes", "terminal"];
-
-/**
- * Icons on the desktop itself. Single click selects, double click opens —
- * the convention people already have in their fingers.
- */
-export function DesktopIcons() {
-  const os = useOs();
-  const [selected, setSelected] = useState<AppId | null>(null);
-
-  const icons = DESKTOP_ICONS.filter((id) => APPS[id].available);
-
-  return (
-    <ul
-      className="absolute top-[46px] left-3 z-10 hidden w-24 space-y-1 xl:block"
-      onPointerDown={(e) => {
-        if (e.target === e.currentTarget) setSelected(null);
-      }}
-    >
-      {icons.map((id) => {
-        const app = APPS[id];
-        const on = selected === id;
-        return (
-          <li key={id}>
-            <button
-              type="button"
-              onClick={() => setSelected(id)}
-              onDoubleClick={() => {
-                os.open(id);
-                setSelected(null);
-              }}
-              aria-label={`${app.label} — double click to open`}
-              className={`flex w-full flex-col items-center gap-1.5 rounded-lg border px-2 py-2.5 transition-colors ${
-                on ? "border-line bg-surface-2/80 backdrop-blur" : "border-transparent"
-              }`}
-            >
-              <span
-                className={`grid h-10 w-10 place-items-center rounded-lg border transition-colors ${
-                  on ? "border-accent text-accent" : "border-line bg-surface/60 text-muted"
-                }`}
-              >
-                <Icon name={app.icon} className="h-4 w-4" />
-              </span>
-              <span
-                className={`text-center font-mono text-[9.5px] leading-tight tracking-[0.1em] uppercase ${
-                  on ? "text-accent" : "text-faint"
-                }`}
-              >
-                {app.label}
-              </span>
-            </button>
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
 
 type MenuState = { x: number; y: number } | null;
 

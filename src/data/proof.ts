@@ -19,9 +19,9 @@ export const liveDeployments = [
   { label: "BrandThis", href: "https://brandthis.in", note: "Brand intelligence SaaS" },
   { label: "Softventory", href: "https://softdigitconsulting.com/", note: "Enterprise SaaS, in production" },
   {
-    label: "Softdigit Consulting",
-    href: "https://soft-digits-consulting.vercel.app",
-    note: "Company site",
+    label: "Mini Playground",
+    href: "https://github.com/Tharun-code-08/MY-IDLE",
+    note: "Browser IDE — source",
   },
 ];
 

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { contact } from "@/data/profile";
 import { publishedProjects } from "@/data/projects";
+import { sites } from "@/data/sites";
 import { launchableApps, type AppId } from "@/lib/apps";
 import { useOs } from "@/lib/os";
 import { Icon } from "./Icon";
@@ -49,6 +50,16 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
         p.study.length > 0 ? os.open("project", p.id, p.name) : window.open(p.links[0]?.href, "_blank", "noopener"),
     }));
 
+    const browsable: Item[] = sites.map((s) => ({
+      id: `site:${s.id}`,
+      label: s.label,
+      hint: s.note,
+      group: "Open in the browser",
+      icon: "browser",
+      keywords: [s.label, s.url, s.note].join(" ").toLowerCase(),
+      run: () => os.open("browser", s.id, "BROWSER"),
+    }));
+
     const links: Item[] = [
       {
         id: "link:github",
@@ -92,7 +103,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       },
     ];
 
-    return [...apps, ...work, ...links];
+    return [...apps, ...work, ...browsable, ...links];
   }, [os]);
 
   const results = useMemo(() => {

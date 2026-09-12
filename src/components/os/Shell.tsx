@@ -5,7 +5,7 @@ import { OsProvider, useOs, type SnapZone } from "@/lib/os";
 import type { AppId } from "@/lib/apps";
 import { Boot } from "./Boot";
 import { Desktop } from "./Desktop";
-import { DesktopContextMenu, DesktopIcons, SnapPreview } from "./DesktopExtras";
+import { DesktopContextMenu, SnapPreview } from "./DesktopExtras";
 import { Dock } from "./Dock";
 import { MenuBar } from "./MenuBar";
 import { MissionControl } from "./MissionControl";
@@ -183,9 +183,6 @@ function ShellInner() {
         setMenu({ x: e.clientX, y: e.clientY });
       }}
     >
-      <div className="desktop-field absolute inset-0" aria-hidden />
-      <div className="desktop-vignette absolute inset-0" aria-hidden />
-
       {booting ? <Boot onDone={() => setBooting(false)} /> : null}
 
       <MenuBar
@@ -195,7 +192,6 @@ function ShellInner() {
       />
 
       <Desktop />
-      <DesktopIcons />
 
       {os.wins.map((win) => (
         <Window key={win.id} win={win} topZ={topZ} onSnapHint={setSnapHint}>

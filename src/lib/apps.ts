@@ -13,7 +13,8 @@ export type AppId =
   | "failures"
   | "contact"
   | "terminal"
-  | "settings";
+  | "settings"
+  | "browser";
 
 export type AppDef = {
   id: AppId;
@@ -151,6 +152,17 @@ export const APPS: Record<AppId, AppDef> = {
     size: { w: 620, h: 580 },
     dock: 10,
     keywords: ["email", "hire", "reach", "linkedin", "phone", "talk"],
+    available: true,
+  },
+  browser: {
+    id: "browser",
+    title: "BROWSER",
+    label: "Browser",
+    hint: "My sites, in here",
+    icon: "browser",
+    size: { w: 900, h: 640 },
+    dock: 8,
+    keywords: ["web", "claxon", "brandthis", "softdigit", "sites", "live"],
     available: true,
   },
   settings: {
