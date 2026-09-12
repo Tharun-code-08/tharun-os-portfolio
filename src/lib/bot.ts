@@ -28,6 +28,10 @@ export type BotEvent =
   | `space:${string}`
   | "devmode"
   | "closed-all"
+  | "clutter"
+  | "theme"
+  | "recruiter"
+  | "reopen"
   | "summon";
 
 export type Line = {
@@ -320,6 +324,85 @@ export const LINES: Line[] = [
     pose: "type",
     priority: 92,
   },
+
+  // --- reacting to the state of the machine -------------------------------
+  {
+    id: "cleared",
+    on: "closed-all",
+    text: "Still building.",
+    emotion: "neutral",
+    pose: "idle",
+    priority: 84,
+  },
+  {
+    id: "clutter",
+    on: "clutter",
+    text: "We're getting cluttered. F2 shows everything at once.",
+    emotion: "playful",
+    pose: "idle",
+    priority: 82,
+    once: true,
+  },
+  {
+    id: "theme",
+    on: "theme",
+    text: "Oh — new setup.",
+    emotion: "curious",
+    pose: "idle",
+    priority: 78,
+    once: true,
+  },
+  {
+    id: "recruiter",
+    on: "recruiter",
+    text: "Short on time? I'll stay out of the way.",
+    emotion: "neutral",
+    pose: "idle",
+    priority: 86,
+  },
+
+  // --- fourth wall, used sparingly ----------------------------------------
+  {
+    id: "again",
+    on: "reopen",
+    text: "You know that's the same window, right?",
+    emotion: "playful",
+    pose: "idle",
+    priority: 60,
+    once: true,
+  },
+  {
+    id: "meta",
+    on: "idle",
+    text: "This site is a work in progress too. The Failure Lab is still empty.",
+    emotion: "thinking",
+    pose: "think",
+    priority: 20,
+    once: true,
+    requires: "tier:3",
+  },
+
+  // --- memory callbacks ----------------------------------------------------
+  {
+    id: "recall-work",
+    on: "open:lab",
+    text: "You looked at Softventory earlier. Half of these questions came out of it.",
+    emotion: "curious",
+    pose: "think",
+    priority: 82,
+    once: true,
+    requires: "opened:project",
+  },
+  {
+    id: "recall-lab",
+    on: "open:proof",
+    text: "After the lab, this is the boring half — the part you can actually check.",
+    emotion: "neutral",
+    pose: "point",
+    priority: 82,
+    once: true,
+    requires: "opened:lab",
+  },
 ];
 
 /* ------------------------------------------------------------------ state - */
@@ -372,6 +455,20 @@ export function markOpened(appId: string) {
   const count = Object.keys(flags).filter((k) => k.startsWith("opened:")).length;
   if (count >= 3) flags.explorer = true;
   writeFlags(flags);
+}
+
+/**
+ * What the visitor has been reading, so the room can lean that way. Not
+ * surveillance — it is a single word held in sessionStorage.
+ */
+export function exploreBias(): "work" | "lab" | "read" | null {
+  const flags = readFlags();
+  const score = { work: 0, lab: 0, read: 0 };
+  if (flags["opened:work"] || flags["opened:project"] || flags["opened:proof"]) score.work += 2;
+  if (flags["opened:lab"] || flags["opened:terminal"]) score.lab += 2;
+  if (flags["opened:log"] || flags["opened:me"] || flags["opened:notes"]) score.read += 2;
+  const best = (Object.keys(score) as (keyof typeof score)[]).sort((a, b) => score[b] - score[a])[0];
+  return score[best] > 0 ? best : null;
 }
 
 export function markReturning() {

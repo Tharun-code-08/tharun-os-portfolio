@@ -7,6 +7,7 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useRef,
   type ReactNode,
 } from "react";
 import { APPS, type AppId } from "@/lib/apps";
@@ -258,6 +259,13 @@ function viewport(): Viewport {
 export function OsProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, undefined, initState);
 
+  // The character notices the shape of the desktop, not just the clicks.
+  const openIds = useRef(new Set<string>());
+  useEffect(() => {
+    openIds.current = new Set(state.wins.map((w) => w.id.replace(/@[a-z]+$/, "")));
+    if (state.wins.filter((w) => w.space === state.space).length >= 4) botSay("clutter");
+  }, [state.wins, state.space]);
+
   useEffect(() => {
     try {
       localStorage.setItem(SESSION_KEY, JSON.stringify(state));
@@ -267,10 +275,17 @@ export function OsProvider({ children }: { children: ReactNode }) {
   }, [state]);
 
   const open = useCallback((appId: AppId, payload?: string, title?: string) => {
+    const id = (payload ? `${appId}:${payload}` : appId);
+    const alreadyOpen = openIds.current.has(id);
     dispatch({ type: "open", appId, payload, title, viewport: viewport() });
-    // Let the character react to what the visitor just did.
-    markOpened(appId);
-    botSay(`open:${appId}`);
+    // Let the character react to what the visitor just did — but don't
+    // re-explain a window they already have open.
+    if (alreadyOpen) {
+      botSay("reopen");
+    } else {
+      markOpened(appId);
+      botSay(`open:${appId}`);
+    }
   }, []);
 
   const api = useMemo<OsApi>(
@@ -278,7 +293,10 @@ export function OsProvider({ children }: { children: ReactNode }) {
       wins: state.wins.filter((w) => w.space === state.space),
       open,
       close: (id) => dispatch({ type: "close", id }),
-      closeAll: () => dispatch({ type: "closeAll" }),
+      closeAll: () => {
+        dispatch({ type: "closeAll" });
+        botSay("closed-all");
+      },
       restoreAll: () => dispatch({ type: "restoreAll" }),
       space: state.space,
       setSpace: (space) => {

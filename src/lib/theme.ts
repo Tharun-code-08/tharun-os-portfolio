@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { botSay } from "@/lib/bot";
 
 export const THEMES = ["dark", "light", "midnight"] as const;
 export type Theme = (typeof THEMES)[number];
@@ -36,6 +37,7 @@ export function setTheme(theme: Theme) {
     /* storage disabled — the choice just won't survive a reload. */
   }
   window.dispatchEvent(new Event(EVENT));
+  botSay("theme");
 }
 
 function subscribe(onChange: () => void) {

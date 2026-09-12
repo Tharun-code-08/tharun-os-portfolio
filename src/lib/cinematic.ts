@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { Pose } from "./bot";
+import type { Pose } from "@/lib/bot";
 
 /**
  * The 15-second loop.

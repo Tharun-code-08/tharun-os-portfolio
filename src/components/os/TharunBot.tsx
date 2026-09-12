@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { botSay, useBot, type Emotion, type Pose } from "@/lib/bot";
-import { WALK_MS, type CinematicState } from "@/lib/cinematic";
+import { WALK_MS } from "@/lib/cinematic";
+import type { LifeState } from "@/lib/life";
 
 type R = [number, number, number, number, string];
 
@@ -17,9 +18,18 @@ const SHOE = "#ece7de";
 const EYE = "#15151b";
 
 /** Eyes and mouth are the whole personality — poses are secondary. */
-function face(emotion: Emotion, look: { x: number; y: number }): R[] {
+function face(emotion: Emotion, look: { x: number; y: number }, blinking: boolean): R[] {
   const ex = Math.round(look.x);
   const ey = Math.round(look.y);
+
+  if (blinking) {
+    // A closed eye is a flat line. Two pixels of it reads as a blink.
+    return [
+      [8 + ex, 6 + ey, 2, 1, EYE],
+      [14 + ex, 6 + ey, 2, 1, EYE],
+      ...mouthFor(emotion),
+    ];
+  }
 
   const eyes: Record<Emotion, R[]> = {
     neutral: [
@@ -55,6 +65,10 @@ function face(emotion: Emotion, look: { x: number; y: number }): R[] {
     ],
   };
 
+  return [...eyes[emotion], ...mouthFor(emotion)];
+}
+
+function mouthFor(emotion: Emotion): R[] {
   const mouth: Record<Emotion, R[]> = {
     neutral: [[10, 9, 4, 1, SKIN_DK]],
     happy: [
@@ -71,8 +85,7 @@ function face(emotion: Emotion, look: { x: number; y: number }): R[] {
       [14, 8, 1, 1, EYE],
     ],
   };
-
-  return [...eyes[emotion], ...mouth[emotion]];
+  return mouth[emotion];
 }
 
 function body(pose: Pose, frame: "a" | "b"): R[] {
@@ -168,10 +181,38 @@ function body(pose: Pose, frame: "a" | "b"): R[] {
   return [...base, ...arms[pose]];
 }
 
-export function TharunBot({ cinematic }: { cinematic: CinematicState }) {
-  const { line, emotion } = useBot();
+export function TharunBot({ life }: { life: LifeState }) {
+  const { line, emotion: spokenEmotion } = useBot();
   const [look, setLook] = useState({ x: 0, y: 0 });
   const [frame, setFrame] = useState<"a" | "b">("a");
+  const [blinking, setBlinking] = useState(false);
+  const [breath, setBreath] = useState(0);
+
+  // Blink on an irregular cadence — a metronome blink reads as a glitch.
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let timer: number;
+    const schedule = () => {
+      timer = window.setTimeout(
+        () => {
+          setBlinking(true);
+          window.setTimeout(() => setBlinking(false), 120);
+          schedule();
+        },
+        2600 + Math.random() * 4200,
+      );
+    };
+    schedule();
+    return () => clearTimeout(timer);
+  }, []);
+
+  // A single pixel of rise and fall. It is the difference between a sprite and
+  // something that appears to be breathing.
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = window.setInterval(() => setBreath((b) => (b === 0 ? 1 : 0)), 1900);
+    return () => clearInterval(id);
+  }, []);
 
   // Subtle head/eye tracking. One pixel of travel is plenty at this scale.
   useEffect(() => {
@@ -189,36 +230,49 @@ export function TharunBot({ cinematic }: { cinematic: CinematicState }) {
 
   // Leg cycle, only while actually crossing the room.
   useEffect(() => {
-    if (!cinematic.walking) return;
+    if (!life.walking) return;
     const id = window.setInterval(() => setFrame((f) => (f === "a" ? "b" : "a")), 130);
     return () => clearInterval(id);
-  }, [cinematic.walking]);
+  }, [life.walking]);
 
-  const mark = cinematic.scene.bot;
-  // A spoken line always wins over the scene's scripted pose.
-  const activePose: Pose = cinematic.walking ? "walk" : (line?.pose ?? mark.pose);
-  const parts = [...body(activePose, frame), ...face(emotion, look)];
+  const { mark } = life;
+  // Priority: walking > what he is saying > what he is doing.
+  const activePose: Pose = life.walking ? "walk" : (line?.pose ?? life.pose);
+  const emotion = line ? spokenEmotion : life.emotion;
+  const parts = [...body(activePose, frame), ...face(emotion, look, blinking)];
+  const onRight = mark.x > 55;
 
   return (
     <div
       className="pointer-events-none absolute bottom-[11%] z-20 hidden h-[26vh] max-h-[260px] min-h-[150px] lg:block"
       style={{
         left: `${mark.x}%`,
-        transform: `translate(-50%, ${-mark.y}%) scale(${mark.scale})`,
+        transform: `translate(-50%, ${breath && !life.walking ? -0.4 : 0}%) scale(${mark.scale})`,
         transformOrigin: "bottom center",
-        transition: `left ${WALK_MS}ms cubic-bezier(0.37,0,0.63,1), transform 700ms cubic-bezier(0.2,0.8,0.2,1)`,
+        transition: `left ${WALK_MS}ms cubic-bezier(0.37,0,0.63,1), transform 900ms ease-in-out`,
       }}
     >
       {line ? (
         <div
           className={`animate-fade-up pointer-events-auto absolute bottom-[62%] w-[17rem] ${
-            mark.x > 55 ? "right-full mr-3" : "left-full ml-3"
+            onRight ? "right-full mr-3" : "left-full ml-3"
           }`}
         >
           <div className="rounded-lg border border-line bg-surface/96 px-3.5 py-3 shadow-2xl backdrop-blur-xl">
             <p className="mb-1 font-mono text-[9px] tracking-[0.22em] text-accent">THARUNBOT</p>
             <p className="text-[12.5px] leading-relaxed text-ink">{line.text}</p>
           </div>
+        </div>
+      ) : life.thought ? (
+        // A thought, not speech — quieter, no name, and it never interrupts.
+        <div
+          className={`animate-fade-up absolute bottom-[66%] w-[15rem] ${
+            onRight ? "right-full mr-3" : "left-full ml-3"
+          }`}
+        >
+          <p className="rounded-lg border border-dashed border-line/70 bg-bg/55 px-3 py-2 text-[11.5px] leading-relaxed text-ink/65 italic backdrop-blur-sm">
+            {life.thought}
+          </p>
         </div>
       ) : null}
 

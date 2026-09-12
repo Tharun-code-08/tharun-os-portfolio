@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { OsProvider, SPACES, useOs, type SnapZone } from "@/lib/os";
-import { botSay } from "@/lib/bot";
-import { hasSkipped, useCinematic } from "@/lib/cinematic";
+import { botSay, exploreBias } from "@/lib/bot";
+import { hasSkipped } from "@/lib/cinematic";
+import { useLife } from "@/lib/life";
 import type { AppId } from "@/lib/apps";
 import { Boot } from "./Boot";
 import { Desktop } from "./Desktop";
@@ -78,7 +79,9 @@ function ShellInner() {
   // The visitor always wins: the loop only runs on a clear, quiet desktop.
   const cinematicOn =
     !skipped && !booting && !recruiter && !devMode && !palette && !mission && os.wins.length === 0;
-  const cinematic = useCinematic(cinematicOn);
+  // What the visitor has been reading nudges what he does next.
+  const bias = exploreBias();
+  const life = useLife(cinematicOn, bias);
 
   const openPalette = useCallback(() => setPalette(true), []);
   const openMission = useCallback(() => setMission(true), []);
@@ -158,7 +161,10 @@ function ShellInner() {
 
       if (e.key.toLowerCase() === "r") {
         e.preventDefault();
-        setRecruiter((r) => !r);
+        setRecruiter((r) => {
+          if (!r) botSay("recruiter");
+          return !r;
+        });
       }
       if (e.key.toLowerCase() === "d") {
         e.preventDefault();
@@ -215,7 +221,7 @@ function ShellInner() {
         onMissionControl={openMission}
       />
 
-      <Desktop cinematic={cinematic} onSkip={() => setSkipped(true)} />
+      <Desktop life={life} onSkip={() => setSkipped(true)} />
 
       {os.wins.map((win) => (
         <Window key={win.id} win={win} topZ={topZ} onSnapHint={setSnapHint}>

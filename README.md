@@ -57,6 +57,22 @@ want a real pixel avatar of yourself.
 
 Desktop icons sit on top in a grid: single click selects, double click opens.
 
+## He lives here
+
+After the welcome film plays once, TharunBOT drops into **ambient mode** — an ongoing life in
+[`life.ts`](src/lib/life.ts) rather than the same fifteen seconds forever.
+
+Five anchors (desk, whiteboard, shelf, couch, window) and a set of activities with real durations.
+Which one comes next is weighted by **the actual hour** — coffee in the morning, notes in the
+evening, "one more fix, famous last words" at night — and nudged by what you have been reading, so
+a visitor who lives in the Lab sees more whiteboard time.
+
+Movement has anticipation: **notice → turn → walk → settle**, never a teleport. He blinks on an
+irregular cadence, breathes by a single pixel, and most activities pass in complete silence. A
+thought appears maybe 45% of the time, in a quieter dashed bubble that is his, not speech to you.
+
+Opening anything pauses all of it. He was here before you arrived and carries on after.
+
 ## The 15-second loop
 
 Five scenes, three seconds each — WAKE, DISCOVER, BUILD, THINK, INVITE — defined in

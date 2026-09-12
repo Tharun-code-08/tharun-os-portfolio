@@ -8,7 +8,8 @@ import { sites } from "@/data/sites";
 import { desktopApps } from "@/lib/apps";
 import { botSay } from "@/lib/bot";
 import { SPACES, useOs } from "@/lib/os";
-import { SCENES, rememberSkip, type CinematicState } from "@/lib/cinematic";
+import { SCENES, rememberSkip } from "@/lib/cinematic";
+import type { LifeState } from "@/lib/life";
 import { Icon } from "./Icon";
 import { Scene } from "./Scene";
 import { Atmosphere } from "./Atmosphere";
@@ -21,21 +22,15 @@ function rgb(css: string): [number, number, number] {
   return [Number(m[0]) / 255, Number(m[1]) / 255, Number(m[2]) / 255];
 }
 
-export function Desktop({
-  cinematic,
-  onSkip,
-}: {
-  cinematic: CinematicState;
-  onSkip: () => void;
-}) {
+export function Desktop({ life, onSkip }: { life: LifeState; onSkip: () => void }) {
   const os = useOs();
   const latest = [...buildLog].sort((a, b) => b.date.localeCompare(a.date))[0];
   const [transmission, setTransmission] = useState(true);
 
   const space = SPACES.find((s) => s.id === os.space) ?? SPACES[0];
   // The scene sets the hour of day; the desk sets the mood of the room.
-  const light = cinematic.playing ? cinematic.scene.light : space.light;
-  const cam = cinematic.playing ? cinematic.scene.camera : { x: 0, y: 0, scale: 1 };
+  const light = life.playing ? life.light : space.light;
+  const cam = life.playing ? life.camera : { x: 0, y: 0, scale: 1 };
 
   return (
     <>
@@ -51,7 +46,7 @@ export function Desktop({
           }}
         >
           <Scene className="h-full w-full" />
-          <Atmosphere tint={rgb(light)} strength={cinematic.playing ? 1 : 0.55} />
+          <Atmosphere tint={rgb(light)} strength={life.playing ? 1 : 0.55} />
         </div>
 
         {/* Hour-of-day wash, driven by the active scene. */}
@@ -170,35 +165,48 @@ export function Desktop({
         </aside>
       ) : null}
 
-      {cinematic.playing ? (
+      {life.playing ? (
         <div className="absolute bottom-6 left-5 z-20 hidden items-center gap-3 lg:flex">
           <span className="font-mono text-[9.5px] tracking-[0.24em] text-ink/50">
-            {String(cinematic.index + 1).padStart(2, "0")} {cinematic.scene.label}
+            {life.mode === "intro"
+              ? `${String(life.index + 1).padStart(2, "0")} ${life.label}`
+              : life.label}
           </span>
-          <span className="flex gap-1">
-            {SCENES.map((s, i) => (
-              <span
-                key={s.id}
-                className={`h-1 rounded-full transition-all duration-500 ${
-                  i === cinematic.index ? "w-4 bg-accent" : "w-1 bg-ink/25"
-                }`}
-              />
-            ))}
-          </span>
-          <button
-            type="button"
-            onClick={() => {
-              rememberSkip();
-              onSkip();
-            }}
-            className="font-mono text-[9.5px] tracking-[0.16em] text-ink/40 transition-colors hover:text-accent"
-          >
-            SKIP INTRO →
-          </button>
+
+          {life.mode === "intro" ? (
+            <>
+              <span className="flex gap-1">
+                {SCENES.map((s, i) => (
+                  <span
+                    key={s.id}
+                    className={`h-1 rounded-full transition-all duration-500 ${
+                      i === life.index ? "w-4 bg-accent" : "w-1 bg-ink/25"
+                    }`}
+                  />
+                ))}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  rememberSkip();
+                  onSkip();
+                }}
+                className="font-mono text-[9.5px] tracking-[0.16em] text-ink/40 transition-colors hover:text-accent"
+              >
+                SKIP INTRO →
+              </button>
+            </>
+          ) : (
+            // Once the film is over he is simply living here — say what he is
+            // doing rather than pretending a scene is still playing.
+            <span className="font-mono text-[9.5px] tracking-[0.16em] text-ink/35">
+              {life.walking ? "· MOVING" : `· ${(life.activityId ?? "").replace(/-/g, " ").toUpperCase()}`}
+            </span>
+          )}
         </div>
       ) : null}
 
-      <TharunBot cinematic={cinematic} />
+      <TharunBot life={life} />
     </>
   );
 }
