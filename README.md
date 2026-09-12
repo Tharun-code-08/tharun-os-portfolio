@@ -27,13 +27,43 @@ npm run lint
 | Key | Does |
 | --- | --- |
 | `⌘K` / `Ctrl+K` / `/` | Command palette — searches apps, projects and links |
-| `R` | Toggle Recruiter Mode |
+| `⌘W` | Close the front window |
+| `⌘M` | Minimise the front window |
+| `⌘↵` | Maximise or restore the front window |
+| `⌘←` `⌘→` | Snap the front window to a half |
+| `⌘1`…`⌘5` | Work, Lab, Build log, Now, Terminal |
+| `⌘,` | Settings |
+| `F2` | Mission Control |
+| `R` | Recruiter Mode |
 | `Esc` | Close the front window |
 | `↑` `↓` in the terminal | Command history |
 | `↑ ↑ ↓ ↓ ← → ← → B A` | Something |
 
+Shortcuts are defined once in `src/lib/shortcuts.ts` and Settings renders that same list, so
+the documentation cannot drift from the handler.
+
 Terminal commands: `help`, `apps`, `open <app>`, `projects`, `skills`, `whoami`, `neofetch`,
-`github`, `linkedin`, `email`, `resume`, `clear`. Two are not in `help`.
+`api`, `theme`, `github`, `linkedin`, `email`, `resume`, `clear`. Two are not in `help`.
+
+## The OS layer
+
+Drag a window to a screen edge and it snaps, with a translucent panel previewing where it lands.
+Right-click the desktop for a context menu. `F2` opens Mission Control. Settings carries three
+themes — Charcoal, Paper, Midnight — that reskin everything with no reload; the choice is applied
+in `<head>` before first paint, so there is no flash on the way back.
+
+The workspace is remembered. Move a window, resize it, snap it, refresh: it comes back as you left
+it, from `localStorage` under `tharun-os-session-v1`.
+
+## The portfolio has an API
+
+```bash
+curl http://localhost:3000/api/portfolio
+curl "http://localhost:3000/api/portfolio?q=projects"
+```
+
+Sections: `projects`, `experience`, `stack`, `buildLog`, `now`, `openQuestions`, `education`.
+It reads the same `src/data` files the UI renders, so there is no second source of truth.
 
 ## Editing the content
 

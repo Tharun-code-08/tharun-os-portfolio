@@ -57,6 +57,8 @@ export function TerminalApp() {
           { text: "  projects          list published work" },
           { text: "  skills            what I build with" },
           { text: "  github | linkedin | email | resume" },
+          { text: "  api               this site serves JSON" },
+          { text: "  theme             three of them" },
           { text: "  whoami | neofetch | clear" },
           { text: "" },
           { text: "There are two commands not on this list.", tone: "dim" },
@@ -153,6 +155,24 @@ export function TerminalApp() {
           { text: `  Uptime    since 2025` },
           { text: `  Status    ${profile.status.state} — ${profile.status.what}` },
         );
+        break;
+
+      case "api":
+      case "curl":
+        print(
+          { text: "This portfolio has an API.", tone: "accent" },
+          { text: "  GET /api/portfolio              everything as JSON" },
+          { text: "  GET /api/portfolio?q=projects   one section" },
+          { text: "  sections: projects experience stack buildLog now openQuestions" },
+          { text: "" },
+          { text: "Opening /api/portfolio...", tone: "dim" },
+        );
+        window.open("/api/portfolio", "_blank", "noopener");
+        break;
+
+      case "theme":
+        os.open("settings");
+        print({ text: "Opening SETTINGS — three themes in there.", tone: "dim" });
         break;
 
       case "clear":

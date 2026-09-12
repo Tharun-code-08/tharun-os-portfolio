@@ -7,9 +7,11 @@ import { useOs } from "@/lib/os";
 export function MenuBar({
   onCommand,
   onRecruiterMode,
+  onMissionControl,
 }: {
   onCommand: () => void;
   onRecruiterMode: () => void;
+  onMissionControl: () => void;
 }) {
   const os = useOs();
   const [clock, setClock] = useState<string | null>(null);
@@ -41,10 +43,11 @@ export function MenuBar({
         {os.wins.length > 0 ? (
           <button
             type="button"
-            onClick={os.closeAll}
+            onClick={onMissionControl}
+            title="Mission Control (F2)"
             className="hidden font-mono text-[10px] tracking-[0.14em] text-faint transition-colors hover:text-accent md:inline"
           >
-            CLOSE ALL ({os.wins.length})
+            WINDOWS ({os.wins.length})
           </button>
         ) : null}
       </div>

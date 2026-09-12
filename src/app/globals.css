@@ -24,6 +24,61 @@
 
 /* ---------------------------------------------------------------- base ---- */
 
+/* ---------------------------------------------------------------- themes ---
+ * Utilities compile to var(--color-*), so redefining the variables under a
+ * [data-theme] selector reskins the whole OS at runtime with no reload.
+ * Settings writes the attribute onto <html> and remembers the choice.
+ */
+
+:root[data-theme="light"] {
+  --color-bg: #f4f2ee;
+  --color-surface: #ffffff;
+  --color-surface-2: #f7f5f1;
+  --color-raised: #ebe8e2;
+  --color-line: #d8d3ca;
+  --color-line-soft: #e7e3db;
+  --color-ink: #15140f;
+  --color-muted: #57534a;
+  --color-faint: #8a8479;
+  --color-accent: #a8620a;
+  --color-accent-ink: #ffffff;
+  --color-ok: #1c7a4b;
+  --color-dim: #6f6a60;
+}
+
+:root[data-theme="midnight"] {
+  --color-bg: #05070d;
+  --color-surface: #0b0f19;
+  --color-surface-2: #111726;
+  --color-raised: #18202f;
+  --color-line: #1f2739;
+  --color-line-soft: #151c2a;
+  --color-ink: #e9eefa;
+  --color-muted: #8794ab;
+  --color-faint: #58627a;
+  --color-accent: #6aa6ff;
+  --color-accent-ink: #04070e;
+  --color-ok: #4ade80;
+  --color-dim: #6d788f;
+}
+
+/* The CRT texture is a dark-theme conceit; it looks like dust in light mode. */
+:root[data-theme="light"] .scanlines::after {
+  display: none;
+}
+
+:root[data-theme="light"] .desktop-vignette {
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(168, 98, 10, 0.07), transparent 60%),
+    radial-gradient(100% 100% at 50% 100%, rgba(0, 0, 0, 0.07), transparent 55%);
+}
+
+:root[data-theme="light"] .desktop-field {
+  background-image:
+    linear-gradient(to right, rgba(0, 0, 0, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.035) 1px, transparent 1px);
+}
+
 /* Kept in @layer base so Tailwind utilities can still override any of it. */
 @layer base {
   * {

@@ -9,6 +9,7 @@ import { LogApp } from "../apps/LogApp";
 import { NowApp, StackApp } from "../apps/StackApp";
 import { ContactApp, ProofApp } from "../apps/ProofApp";
 import { TerminalApp } from "../apps/TerminalApp";
+import { SettingsApp } from "../apps/SettingsApp";
 
 /**
  * Memoised so dragging a window does not re-render its contents.
@@ -45,5 +46,7 @@ export const AppHost = memo(function AppHost({
       return <ContactApp />;
     case "terminal":
       return <TerminalApp />;
+    case "settings":
+      return <SettingsApp />;
   }
 });

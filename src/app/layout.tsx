@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { profile, contact } from "@/data/profile";
+import { THEME_BOOTSTRAP } from "@/lib/theme";
 import "./globals.css";
 
 const inter = Inter({
@@ -58,14 +59,17 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#070707",
-  colorScheme: "dark",
+  colorScheme: "dark light",
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
+      </head>
       <body className={`${inter.variable} ${mono.variable} antialiased`}>{children}</body>
     </html>
   );

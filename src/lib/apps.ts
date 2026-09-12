@@ -12,7 +12,8 @@ export type AppId =
   | "notes"
   | "failures"
   | "contact"
-  | "terminal";
+  | "terminal"
+  | "settings";
 
 export type AppDef = {
   id: AppId;
@@ -150,6 +151,17 @@ export const APPS: Record<AppId, AppDef> = {
     size: { w: 620, h: 580 },
     dock: 10,
     keywords: ["email", "hire", "reach", "linkedin", "phone", "talk"],
+    available: true,
+  },
+  settings: {
+    id: "settings",
+    title: "SETTINGS",
+    label: "Settings",
+    hint: "Make it yours",
+    icon: "settings",
+    size: { w: 660, h: 580 },
+    dock: 12,
+    keywords: ["theme", "appearance", "dark", "light", "shortcuts", "keyboard", "about"],
     available: true,
   },
   terminal: {

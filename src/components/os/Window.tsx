@@ -1,22 +1,34 @@
 "use client";
 
 import { useCallback, useRef, type ReactNode } from "react";
-import { useOs, type Win } from "@/lib/os";
+import { useOs, type SnapZone, type Win } from "@/lib/os";
 import { Icon } from "./Icon";
 
 const TOP_BAR = 34;
+const EDGE = 16;
+
+/** Which half of the screen a drag is currently hovering, if any. */
+function zoneFor(x: number, y: number): SnapZone | null {
+  if (y <= TOP_BAR + 8) return "top";
+  if (x <= EDGE) return "left";
+  if (x >= window.innerWidth - EDGE) return "right";
+  return null;
+}
 
 export function Window({
   win,
   topZ,
+  onSnapHint,
   children,
 }: {
   win: Win;
   topZ: number;
+  onSnapHint: (zone: SnapZone | null) => void;
   children: ReactNode;
 }) {
   const os = useOs();
   const drag = useRef<{ dx: number; dy: number } | null>(null);
+  const zone = useRef<SnapZone | null>(null);
   const size = useRef<{ x: number; y: number; w: number; h: number } | null>(null);
   const focused = win.z === topZ;
 
@@ -36,13 +48,23 @@ export function Window({
       const x = e.clientX - drag.current.dx;
       const y = Math.max(TOP_BAR + 2, e.clientY - drag.current.dy);
       os.move(win.id, x, y);
+
+      const next = zoneFor(e.clientX, e.clientY);
+      if (next !== zone.current) {
+        zone.current = next;
+        onSnapHint(next);
+      }
     },
-    [os, win.id],
+    [os, win.id, onSnapHint],
   );
 
   const endDrag = useCallback(() => {
+    if (!drag.current) return;
     drag.current = null;
-  }, []);
+    if (zone.current) os.snap(win.id, zone.current);
+    zone.current = null;
+    onSnapHint(null);
+  }, [os, win.id, onSnapHint]);
 
   const onResizePointerDown = useCallback(
     (e: React.PointerEvent) => {
