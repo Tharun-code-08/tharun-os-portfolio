@@ -98,16 +98,18 @@ export function Player() {
       s.current.vx = s.current.vy = s.current.vz = 0;
       runtime.input.moveTarget = null;
     };
-    // Drop a ray from the sky so a teleport lands on decks and floors, not in them.
+    // Drop a ray from just above the ground, so a teleport lands on decks and
+    // floors rather than in them — and under roofs rather than on top of them.
     const groundAt = (x: number, z: number) => {
-      const ray = new rapier.Ray({ x, y: 40, z }, { x: 0, y: -1, z: 0 });
+      const top = heightAt(x, z) + 2.4;
+      const ray = new rapier.Ray({ x, y: top, z }, { x: 0, y: -1, z: 0 });
       const hit = world.castRay(
         ray,
-        80,
+        6,
         true,
         rapier.QueryFilterFlags.EXCLUDE_SENSORS | rapier.QueryFilterFlags.EXCLUDE_KINEMATIC,
       );
-      return hit ? 40 - hit.timeOfImpact : heightAt(x, z);
+      return hit ? top - hit.timeOfImpact : heightAt(x, z);
     };
     return onGame((e) => {
       if (e.type === "teleport") {
