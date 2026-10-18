@@ -18,7 +18,7 @@ const SEQUENCE = [
 ];
 
 /** Up up down down left right left right B A. Because of course. */
-export function Konami() {
+export function Konami({ onUnlock }: { onUnlock?: () => void } = {}) {
   const [open, setOpen] = useState(false);
   const progress = useRef(0);
 
@@ -30,11 +30,12 @@ export function Konami() {
       if (progress.current === SEQUENCE.length) {
         progress.current = 0;
         setOpen(true);
+        onUnlock?.();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [onUnlock]);
 
   if (!open) return null;
   return <ReactionTest onClose={() => setOpen(false)} />;

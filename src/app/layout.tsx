@@ -1,11 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Unbounded } from "next/font/google";
 import { profile, contact } from "@/data/profile";
 import { THEME_BOOTSTRAP } from "@/lib/theme";
 import "./globals.css";
 
 const inter = Inter({
   variable: "--font-inter",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const display = Unbounded({
+  variable: "--font-unbounded",
   subsets: ["latin"],
   display: "swap",
 });
@@ -72,7 +78,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
       </head>
-      <body className={`${inter.variable} ${mono.variable} antialiased`}>{children}</body>
+      <body className={`${inter.variable} ${mono.variable} ${display.variable} antialiased`}>{children}</body>
     </html>
   );
 }

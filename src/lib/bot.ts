@@ -32,7 +32,18 @@ export type BotEvent =
   | "theme"
   | "recruiter"
   | "reopen"
-  | "summon";
+  | "summon"
+  // --- the island ---------------------------------------------------------
+  | `zone:${string}`
+  | "game:enter"
+  | "game:return"
+  | "game:idle"
+  | "collect"
+  | "fall"
+  | "achievement"
+  | "os:boot"
+  | "os:exit"
+  | "finale";
 
 export type Line = {
   id: string;
@@ -403,6 +414,48 @@ export const LINES: Line[] = [
     once: true,
     requires: "opened:lab",
   },
+  // --- the island ----------------------------------------------------------
+  // On the island the visitor *is* Tharun, so these read as thinking out loud
+  // rather than talking to someone across a desk.
+  {
+    id: "g-greet",
+    on: "game:enter",
+    text: "Hey — you made it. Walk around; everything on this island is something I built.",
+    emotion: "happy",
+    pose: "wave",
+    priority: 95,
+    once: true,
+  },
+  {
+    id: "g-back",
+    on: "game:return",
+    text: "Welcome back. The island remembers where you've been.",
+    emotion: "happy",
+    pose: "wave",
+    priority: 95,
+    once: true,
+  },
+  { id: "z-studio", on: "zone:studio", text: "The studio. That CRT on the desk still runs THARUN OS.", emotion: "proud", pose: "point", priority: 60 },
+  { id: "z-workshop", on: "zone:workshop", text: "Everything here shipped, or is shipping. Walk up to one.", emotion: "proud", pose: "point", priority: 60 },
+  { id: "z-lab", on: "zone:lab", text: "The lab. Questions I haven't finished answering.", emotion: "curious", pose: "think", priority: 60 },
+  { id: "z-arcade", on: "zone:arcade", text: "One cabinet per part of the stack. Somebody left crates by the roof.", emotion: "playful", pose: "point", priority: 60 },
+  { id: "z-tower", on: "zone:tower", text: "If you've got something to build, this is where you tell me.", emotion: "happy", pose: "point", priority: 60 },
+  { id: "z-board", on: "zone:board", text: "What I'm doing this month. If it's stale, tell me.", emotion: "neutral", pose: "idle", priority: 60 },
+  { id: "z-road", on: "zone:timeline", text: "The long road. It starts with XR, before university.", emotion: "neutral", pose: "idle", priority: 60 },
+  { id: "collect-1", on: "collect", text: "A floating commit. There are five of these.", emotion: "surprised", pose: "idle", priority: 50, once: true },
+  { id: "collect-n", on: "collect", text: "git add . — another one.", emotion: "playful", pose: "idle", priority: 40 },
+  { id: "fall-1", on: "fall", text: "Okay. Not that way.", emotion: "surprised", pose: "idle", priority: 80, once: true },
+  { id: "fall-n", on: "fall", text: "The island has edges. You keep finding them.", emotion: "playful", pose: "idle", priority: 70 },
+  { id: "os-boot", on: "os:boot", text: "Booting the old OS. Esc on an empty desk brings you back out.", emotion: "playful", pose: "type", priority: 70, once: true },
+  { id: "os-exit", on: "os:exit", text: "Back outside.", emotion: "neutral", pose: "idle", priority: 50 },
+  { id: "ach", on: "achievement", text: "Nice. That one's rarer than you'd think.", emotion: "proud", pose: "wave", priority: 45 },
+  { id: "finale", on: "finale", text: "You've seen all of it. I'd like to hear what you're building.", emotion: "happy", pose: "wave", priority: 99, once: true },
+  { id: "g-idle-1", on: "game:idle", text: "Shift to run, Space to jump. The arcade roof needs both.", emotion: "neutral", pose: "idle", priority: 10 },
+  { id: "g-idle-2", on: "game:idle", text: "M opens the map. You can fast-travel from it.", emotion: "neutral", pose: "idle", priority: 10 },
+  { id: "g-idle-3", on: "game:idle", text: "Short on time? R gets you the one-page version.", emotion: "neutral", pose: "idle", priority: 10 },
+  { id: "g-idle-4", on: "game:idle", text: "Five commits are floating around this island. Look up.", emotion: "curious", pose: "idle", priority: 10 },
+  { id: "g-idle-5", on: "game:idle", text: "Every stone on the road is a real moment, in order.", emotion: "thinking", pose: "think", priority: 10 },
+  { id: "g-idle-6", on: "game:idle", text: "Not everything here worked the first time. That's the point.", emotion: "thinking", pose: "think", priority: 10 },
 ];
 
 /* ------------------------------------------------------------------ state - */
