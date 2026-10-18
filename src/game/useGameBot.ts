@@ -6,6 +6,7 @@ import { runtime } from "./runtime";
 import { useGame } from "./store";
 
 const BUBBLE_MS = 5200;
+let greeted = false;
 const AMBIENT_MS = 38_000;
 
 /**
@@ -34,6 +35,8 @@ export function useGameBot(active: boolean) {
     });
 
     const hello = window.setTimeout(() => {
+      if (greeted) return;
+      greeted = true;
       const back = isReturning() || useGame.getState().visited.length > 0;
       if (back) markReturning();
       botSay(back ? "game:return" : "game:enter");

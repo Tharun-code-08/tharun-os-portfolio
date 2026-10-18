@@ -7,7 +7,7 @@ import { LAYOUT, heightAt } from "./terrain";
  * Components read it inside useFrame / requestAnimationFrame.
  */
 
-export type Anim = "idle" | "walk" | "run" | "jump" | "fall" | "land" | "wave" | "interact";
+export type Anim = "idle" | "walk" | "run" | "jump" | "fall" | "land" | "wave" | "interact" | "victory";
 
 const [sx, sz] = LAYOUT.spawn;
 
@@ -29,6 +29,8 @@ export const runtime = {
     landImpact: 0,
     /** performance.now() until which an idle player waves. */
     waveUntil: 0,
+    /** performance.now() until which an idle player celebrates. */
+    cheerUntil: 0,
   },
   input: {
     /** Virtual joystick, -1..1. */

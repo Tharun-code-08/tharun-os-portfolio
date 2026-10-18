@@ -110,3 +110,25 @@ export function faceted<T extends BufferGeometry>(geo: T): BufferGeometry {
   g.computeVertexNormals();
   return g;
 }
+
+/**
+ * Screen-door fade for things the camera can end up inside (tree crowns,
+ * rocks): fragments closer than `far` metres to the camera dissolve in a
+ * dither pattern, gone entirely by `near`. No sorting, no transparency.
+ */
+export function nearFade<T extends MeshToonMaterial>(m: T, near = 1.2, far = 3.4): T {
+  m.onBeforeCompile = (shader) => {
+    shader.fragmentShader = shader.fragmentShader.replace(
+      "void main() {",
+      `float nfBayer2(vec2 a) { a = floor(a); return fract(dot(a, vec2(0.5, a.y * 0.75))); }
+float nfBayer4(vec2 a) { return nfBayer2(0.5 * a) * 0.25 + nfBayer2(a); }
+void main() {
+  {
+    float keep = smoothstep(${near.toFixed(2)}, ${far.toFixed(2)}, length(vViewPosition));
+    if (keep < 0.999 && keep <= nfBayer4(gl_FragCoord.xy)) discard;
+  }`,
+    );
+  };
+  m.customProgramCacheKey = () => `nearFade-${near}-${far}`;
+  return m;
+}

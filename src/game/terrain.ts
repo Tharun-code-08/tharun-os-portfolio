@@ -62,6 +62,9 @@ const HILLS: [number, number, number, number][] = [
 
 export const ISLAND_RADIUS = 40;
 
+/** Where the spring spills over the edge (radians around the island). */
+export const SPRING_THETA = -2.62;
+
 /** An irregular coastline, so the island never reads as a perfect disc. */
 export function coastRadius(theta: number): number {
   return (

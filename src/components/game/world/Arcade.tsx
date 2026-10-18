@@ -11,6 +11,7 @@ import { useGame } from "@/game/store";
 import { heightAt, LAYOUT } from "@/game/terrain";
 import { ARCADE_ROOF, CABINET_SLOTS } from "@/game/zones";
 import { Box, Cyl, FONT_MONO, Label } from "./kit";
+import { Cutaway } from "./Cutaway";
 
 const NEON = ["#ff4fd8", "#4fd8ff", "#ffb020", "#57d18a", "#c77dff", "#ff7a45", "#6aa6ff"];
 
@@ -111,13 +112,16 @@ export function Arcade() {
         {CABINET_SLOTS.map(({ group, x, z, facing }) => (
           <CuboidCollider key={group.label} args={[0.45, 1.0, 0.45]} position={[x, heightAt(x, z) + 1, z]} rotation={[0, facing, 0]} />
         ))}
-        <CuboidCollider args={[S / 2, 0.15, S / 2]} position={[cx, top - 0.15, cz]} />
         {posts.map(([x, z]) => (
           <CuboidCollider key={`${x}${z}`} args={[0.18, (top - g) / 2, 0.18]} position={[x, g + (top - g) / 2, z]} />
         ))}
         {crates.map(([x, z, n]) => (
           <CuboidCollider key={`${x}${z}`} args={[C / 2, (C * n) / 2, C / 2]} position={[x, heightAt(x, z) + (C * n) / 2 - 0.05, z]} />
         ))}
+      </RigidBody>
+      {/* Walkable roof, but the camera looks straight through it. */}
+      <RigidBody type="fixed" colliders={false} userData={{ cameraIgnore: true, surface: "wood" }}>
+        <CuboidCollider args={[S / 2, 0.15, S / 2]} position={[cx, top - 0.15, cz]} />
       </RigidBody>
 
       {/* Floor: checker tiles */}
@@ -145,7 +149,9 @@ export function Arcade() {
       {posts.map(([x, z]) => (
         <Box key={`${x}${z}`} size={[0.32, top - g, 0.32]} position={[x, g + (top - g) / 2, z]} color="#2b2b37" />
       ))}
-      <Box size={[S, 0.3, S]} position={[cx, top - 0.15, cz]} color="#3a2f4a" />
+      <Cutaway x={cx} z={cz} halfX={S / 2} halfZ={S / 2} below={top - 1}>
+        <Box size={[S, 0.3, S]} position={[cx, top - 0.15, cz]} color="#3a2f4a" />
+      </Cutaway>
       <Box size={[S + 0.2, 0.08, S + 0.2]} position={[cx, top - 0.32, cz]} material={glow("#c77dff", 1.3)} cast={false} />
 
       {/* Neon sign on the roof edge facing the studio */}

@@ -33,8 +33,13 @@ function Item({ t }: { t: Toast }) {
 
 export function Toasts() {
   const toasts = useGame((s) => s.toasts);
+  const panel = useGame((s) => s.panelOpen);
   return (
-    <ul className="pointer-events-none absolute top-20 left-1/2 z-[70] flex -translate-x-1/2 flex-col items-center gap-2">
+    <ul
+      className={`pointer-events-none absolute top-20 z-[70] flex flex-col gap-2 ${
+        panel ? "left-4 items-start sm:left-6" : "left-1/2 -translate-x-1/2 items-center"
+      }`}
+    >
       {toasts.map((t) => (
         <Item key={t.id} t={t} />
       ))}

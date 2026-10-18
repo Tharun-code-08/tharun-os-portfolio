@@ -42,16 +42,16 @@ export function MenuBar({
             type="button"
             onClick={onExit}
             title="Log off (Esc on an empty desk)"
-            className="flex items-center gap-1.5 rounded border border-accent/40 bg-accent/10 px-2 py-0.5 font-mono text-[10px] tracking-[0.14em] text-accent transition-colors hover:bg-accent hover:text-accent-ink"
+            className="flex shrink-0 items-center gap-1.5 rounded border border-accent/40 bg-accent/10 px-2 py-0.5 font-mono text-[10px] tracking-[0.14em] whitespace-nowrap text-accent transition-colors hover:bg-accent hover:text-accent-ink"
           >
             <span aria-hidden>⏻</span>
-            {exitLabel}
+            <span className="hidden sm:inline">{exitLabel}</span>
           </button>
         ) : null}
-        <span className="font-mono text-[11px] tracking-[0.22em] text-ink">
+        <span className="font-mono text-[11px] tracking-[0.22em] whitespace-nowrap text-ink">
           {profile.os.name}
         </span>
-        <span className="hidden font-mono text-[10px] tracking-[0.14em] text-faint sm:inline">
+        <span className="hidden font-mono text-[10px] tracking-[0.14em] whitespace-nowrap text-faint xl:inline">
           v{profile.os.version} · {profile.os.edition}
         </span>
 

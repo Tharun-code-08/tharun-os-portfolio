@@ -10,6 +10,7 @@ import { liveSky } from "@/game/sky";
 import { useGame } from "@/game/store";
 import { STUDIO } from "@/game/zones";
 import { Box, Cyl, FONT_MONO, Label } from "./kit";
+import { Cutaway } from "./Cutaway";
 
 const W = STUDIO.width;
 const D = STUDIO.depth;
@@ -113,12 +114,14 @@ export function Studio() {
         <CuboidCollider args={[W / 2, H / 2, 0.14]} position={[0, f + H / 2, -D / 2]} />
         <CuboidCollider args={[0.14, H / 2, D / 2]} position={[-W / 2, f + H / 2, 0]} />
         <CuboidCollider args={[0.14, H / 2, D / 2]} position={[W / 2, f + H / 2, 0]} />
-        {/* roof */}
-        <CuboidCollider args={[W / 2 + 0.7, 0.15, D / 2 + 0.9]} position={[0, f + H + 0.25, 0.2]} rotation={[0.07, 0, 0]} />
         {/* desk, shelf, couch */}
         <CuboidCollider args={[0.95, 0.4, 0.42]} position={[dx, f + 0.4, dz]} />
         <CuboidCollider args={[0.22, 1.1, 0.8]} position={[-W / 2 + 0.38, f + 1.1, -1.2]} />
         <CuboidCollider args={[1.1, 0.35, 0.45]} position={[-2.4, f + 0.35, 2.3]} />
+      </RigidBody>
+      {/* The roof is its own body so the camera can see through it. */}
+      <RigidBody type="fixed" colliders={false} userData={{ cameraIgnore: true }}>
+        <CuboidCollider args={[W / 2 + 0.7, 0.15, D / 2 + 0.9]} position={[0, f + H + 0.25, 0.2]} rotation={[0.07, 0, 0]} />
       </RigidBody>
 
       {/* Deck + porch */}
@@ -145,9 +148,11 @@ export function Studio() {
       ))}
       <Box size={[W + 0.3, 0.3, 0.3]} position={[0, f + H - 0.1, D / 2]} color={PAL.woodDark} />
 
-      {/* Roof */}
-      <Box size={[W + 1.4, 0.26, D + 1.8]} position={[0, f + H + 0.25, 0.2]} rotation={[0.07, 0, 0]} color={PAL.roof} />
-      <Box size={[W + 1.5, 0.12, 0.3]} position={[0, f + H - 0.05, D / 2 + 1.1]} rotation={[0.07, 0, 0]} color={PAL.roofDark} />
+      {/* Roof — fades away while you are inside */}
+      <Cutaway x={cx} z={cz + 0.2} halfX={W / 2} halfZ={D / 2 + 0.6} below={f + H - 0.4}>
+        <Box size={[W + 1.4, 0.26, D + 1.8]} position={[0, f + H + 0.25, 0.2]} rotation={[0.07, 0, 0]} color={PAL.roof} />
+        <Box size={[W + 1.5, 0.12, 0.3]} position={[0, f + H - 0.05, D / 2 + 1.1]} rotation={[0.07, 0, 0]} color={PAL.roofDark} />
+      </Cutaway>
 
       {/* Sign */}
       <Box size={[2.6, 0.6, 0.08]} position={[0, f + H + 0.75, D / 2 + 0.95]} color={PAL.woodDark} />

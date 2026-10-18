@@ -16,6 +16,10 @@ const INTRO_MS = 3200;
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 const easeIn = (t: number) => t * t * t;
 
+/** Roofs and canopies fade away instead of shoving the camera into your face. */
+const seeThrough = (c: { parent: () => { userData?: unknown } | null }) =>
+  !(c.parent()?.userData as { cameraIgnore?: boolean } | undefined)?.cameraIgnore;
+
 /**
  * One camera, many shots.
  *
@@ -125,6 +129,10 @@ export function CameraRig() {
       dist,
       true,
       rapier.QueryFilterFlags.EXCLUDE_SENSORS | rapier.QueryFilterFlags.EXCLUDE_KINEMATIC,
+      undefined,
+      undefined,
+      undefined,
+      seeThrough,
     );
     const safe = hit ? Math.max(1.4, hit.timeOfImpact - 0.35) : dist;
 
@@ -199,6 +207,8 @@ export function CameraRig() {
         const k = g.mode === "os" ? 1 : Math.min(1, elapsed / DIVE_MS);
         const e = easeInOut(k);
         cur.pos.lerpVectors(f.pos, v.monitorCam, g.mode === "os" ? 1 : e);
+        // Arc up and over his head instead of through it.
+        if (g.mode === "os-enter") cur.pos.y += Math.sin(e * Math.PI) * 1.1;
         cur.look.lerpVectors(f.look, v.monitor, g.mode === "os" ? 1 : Math.min(1, e * 1.4));
         fov = MathUtils.lerp(f.fov, 32, easeIn(k));
         if (g.mode === "os-enter" && elapsed >= DIVE_MS) g.setMode("os");
@@ -209,6 +219,7 @@ export function CameraRig() {
         const e = easeInOut(k);
         followPose(false, pose2);
         cur.pos.lerpVectors(v.monitorCam, pose2.pos, e);
+        cur.pos.y += Math.sin(e * Math.PI) * 1.1;
         cur.look.lerpVectors(v.monitor, pose2.look, e);
         fov = MathUtils.lerp(32, FOV, e);
         if (elapsed >= EXIT_MS) g.setMode("play");

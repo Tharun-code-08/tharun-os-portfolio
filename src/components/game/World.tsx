@@ -1,7 +1,7 @@
 "use client";
 
-import { Suspense } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Suspense, useEffect } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
 import { Physics } from "@react-three/rapier";
 import { PerformanceMonitor } from "@react-three/drei";
 import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
@@ -16,6 +16,18 @@ import { Sea } from "./world/Sea";
 import { Foliage } from "./world/Foliage";
 import { Effects } from "./world/Effects";
 import { Sensors } from "./world/Sensors";
+import { Life } from "./world/Life";
+
+/** Dev only: lets the console step frames and read renderer stats. */
+function DevHandle() {
+  const advance = useThree((s) => s.advance);
+  const gl = useThree((s) => s.gl);
+  useEffect(() => {
+    if (process.env.NODE_ENV === "production") return;
+    (window as unknown as { __r3f: unknown }).__r3f = { advance, gl };
+  }, [advance, gl]);
+  return null;
+}
 
 /**
  * The 3D layer. Everything here is presentation and physics; the rules live in
@@ -54,6 +66,7 @@ export function World() {
         />
       ) : null}
 
+      <DevHandle />
       <Suspense fallback={null}>
         <Environment />
         <Sea />
@@ -62,6 +75,7 @@ export function World() {
           <Places />
           <Sensors />
           <Foliage />
+          <Life />
           <Player />
           <CameraRig />
         </Physics>

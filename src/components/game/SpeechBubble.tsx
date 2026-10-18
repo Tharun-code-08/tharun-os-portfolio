@@ -13,8 +13,10 @@ import { useGameBot } from "@/game/useGameBot";
  * the rotating model, so the bubble never spins when he turns around.
  */
 export function SpeechBubble() {
-  const playing = useGame((s) => s.mode === "play" || s.mode === "os-exit");
-  const hidden = useGame((s) => s.panelOpen || !!s.overlay);
+  // Listening from the first step on the island; only the bubble hides while
+  // a panel, a menu or the OS is in front.
+  const playing = useGame((s) => s.mode !== "title" && s.mode !== "intro");
+  const hidden = useGame((s) => s.panelOpen || !!s.overlay || s.mode === "os" || s.mode === "os-enter");
   const line = useGameBot(playing);
   const anchor = useRef<Group>(null);
 

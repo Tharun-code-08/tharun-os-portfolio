@@ -47,6 +47,12 @@ function Game() {
   }, []);
 
   useEffect(() => installKeys(), []);
+
+  // Dev-only handle for poking at the game from the console.
+  useEffect(() => {
+    if (process.env.NODE_ENV === "production") return;
+    (window as unknown as { __game: unknown }).__game = { store: useGame, runtime, emit, os };
+  }, [os]);
   // Leaving for the classic OS should not leave the music playing behind it.
   useEffect(() => () => stopMusic(), []);
 
@@ -92,6 +98,7 @@ function Game() {
     if (count > prevCount.current) {
       sfx("achievement");
       botSay("achievement");
+      runtime.player.cheerUntil = performance.now() + 1700;
     }
     prevCount.current = count;
   }, [count]);

@@ -98,17 +98,28 @@ export function Player() {
       s.current.vx = s.current.vy = s.current.vz = 0;
       runtime.input.moveTarget = null;
     };
+    // Drop a ray from the sky so a teleport lands on decks and floors, not in them.
+    const groundAt = (x: number, z: number) => {
+      const ray = new rapier.Ray({ x, y: 40, z }, { x: 0, y: -1, z: 0 });
+      const hit = world.castRay(
+        ray,
+        80,
+        true,
+        rapier.QueryFilterFlags.EXCLUDE_SENSORS | rapier.QueryFilterFlags.EXCLUDE_KINEMATIC,
+      );
+      return hit ? 40 - hit.timeOfImpact : heightAt(x, z);
+    };
     return onGame((e) => {
       if (e.type === "teleport") {
         useGame.getState().fade();
-        window.setTimeout(() => place(e.x, heightAt(e.x, e.z) + 0.2, e.z), 220);
+        window.setTimeout(() => place(e.x, groundAt(e.x, e.z) + 0.05, e.z), 220);
       }
       if (e.type === "respawn") {
         const safe = runtime.player.lastSafe;
         place(safe.x, safe.y + 0.6, safe.z);
       }
     });
-  }, []);
+  }, [world, rapier]);
 
   const tmp = useMemo(() => new Vector3(), []);
 
@@ -234,9 +245,11 @@ export function Player() {
             ? "run"
             : st.speed > 0.45
               ? "walk"
-              : performance.now() < p.waveUntil
-                ? "wave"
-                : "idle";
+              : performance.now() < p.cheerUntil
+                ? "victory"
+                : performance.now() < p.waveUntil
+                  ? "wave"
+                  : "idle";
 
     // Footsteps on the beat of the stride.
     if (st.grounded && st.speed > 0.45) {
@@ -266,6 +279,9 @@ export function Player() {
     if (visual.current) {
       visual.current.position.copy(p.position);
       visual.current.rotation.y = p.facing;
+      // Never let the camera end up inside his head.
+      const head = tmp.set(p.position.x, p.position.y + 1.3, p.position.z);
+      visual.current.visible = state.camera.position.distanceTo(head) > 0.75;
     }
   });
 

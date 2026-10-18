@@ -22,16 +22,19 @@ import {
   UniformsLib,
   UniformsUtils,
 } from "three";
-import { faceted, PAL, toonGradient } from "@/game/materials";
+import { faceted, nearFade, PAL, toonGradient } from "@/game/materials";
 import { QUALITY } from "@/game/quality";
 import { liveSky } from "@/game/sky";
 import { effectiveQuality, useGame } from "@/game/store";
-import { coastRadius, heightAt, insideIsland, pathDistance, rng } from "@/game/terrain";
+import { coastRadius, heightAt, insideIsland, pathDistance, rng, SPRING_THETA } from "@/game/terrain";
 import { ZONES } from "@/game/zones";
 
 /** Keep plants off paths, out of the places, and away from the cliff edge. */
+const SPRING: [number, number] = [Math.cos(SPRING_THETA) * 38, Math.sin(SPRING_THETA) * 38];
+
 function clear(x: number, z: number, margin: number) {
   if (!insideIsland(x, z, margin)) return false;
+  if (Math.hypot(x - SPRING[0], z - SPRING[1]) < 5) return false;
   if (pathDistance(x, z) < 1.8) return false;
   for (const zone of ZONES) {
     if (zone.radius === 0) continue;
@@ -67,19 +70,19 @@ function Trees({ density }: { density: number }) {
     const grad = toonGradient();
     const trunk = new InstancedMesh(
       new CylinderGeometry(0.16, 0.24, 1.6, 7),
-      new MeshToonMaterial({ color: PAL.trunk, gradientMap: grad }),
+      nearFade(new MeshToonMaterial({ color: PAL.trunk, gradientMap: grad })),
       trees.length,
     );
     const round = trees.filter((t) => t.kind === 0);
     const pine = trees.filter((t) => t.kind === 1);
     const crown = new InstancedMesh(
       faceted(new IcosahedronGeometry(1, 0)),
-      new MeshToonMaterial({ color: "#ffffff", gradientMap: grad }),
+      nearFade(new MeshToonMaterial({ color: "#ffffff", gradientMap: grad })),
       round.length * 3,
     );
     const cone = new InstancedMesh(
       faceted(new ConeGeometry(1, 1.6, 7)),
-      new MeshToonMaterial({ color: "#ffffff", gradientMap: grad }),
+      nearFade(new MeshToonMaterial({ color: "#ffffff", gradientMap: grad })),
       pine.length * 3,
     );
     const o = new Object3D();
@@ -164,7 +167,7 @@ function Rocks() {
   const mesh = useMemo(() => {
     const m = new InstancedMesh(
       faceted(new DodecahedronGeometry(1, 0)),
-      new MeshToonMaterial({ color: PAL.stone, gradientMap: toonGradient() }),
+      nearFade(new MeshToonMaterial({ color: PAL.stone, gradientMap: toonGradient() })),
       rocks.length,
     );
     const o = new Object3D();
