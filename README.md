@@ -1,11 +1,16 @@
-# THARUN OS
+# THARUN — a playable portfolio
 
-A portfolio built as a desktop operating system. Boot sequence, draggable windows, a dock,
-a command palette, a terminal that actually runs commands — and a Recruiter Mode for people
-who do not want any of that.
+A small floating island you walk around as me. Every place on it is a part of the portfolio: the
+workshop holds the projects, the lab holds the open questions, the road is the build log, the arcade
+is the stack, the radio tower is how you reach me. The studio in the middle has a CRT on the desk —
+walk up, press E, and the camera dives into the glass and boots **THARUN OS**, the desktop portfolio
+this site used to be.
 
-Next.js 16 · React 19 · TypeScript · Tailwind CSS v4. No UI libraries, no icon packs,
-no animation libraries. Everything in `src/components` is hand-written.
+It is a portfolio first: a recruiter is one key (`R`) from a plain, printable résumé, and the classic
+OS is one click from the title screen.
+
+Next.js 16 · React 19 · TypeScript · Tailwind v4 · three.js through react-three-fiber · Rapier
+physics · Blender for the character and the computer · Web Audio for every sound (no audio files).
 
 ```bash
 npm install
@@ -14,135 +19,129 @@ npm run build    # production build
 npm run lint
 ```
 
-## Two ways in
+## Three ways in
 
-| Audience | What they get | How |
+| Who | What they get | How |
 | --- | --- | --- |
-| Someone curious | The OS — windows, dock, terminal, easter eggs | Default |
-| Someone hiring, in a hurry | A plain, scrollable, printable résumé page | Press `R`, or the menu-bar button |
-| Phones | A command centre with full-screen sheets, no dragging | Automatic below 820px |
+| Someone curious | The island — walk, explore, collect, boot the OS | Default |
+| Someone hiring, in a hurry | A plain, scrollable, printable résumé | `R` anywhere, or the title menu |
+| Someone who wants the desktop | THARUN OS, no game | Title menu → Classic OS, or `/?classic=1` |
 
-## Keyboard
+`prefers-reduced-motion` and browsers without WebGL get the classic OS automatically, so nobody is
+handed a flying camera they did not ask for. `/?play=1` forces the game. Switching between the two is
+a re-render, not a reload.
 
-| Key | Does |
+## Controls
+
+| Input | Does |
 | --- | --- |
-| `⌘K` / `Ctrl+K` / `/` | Command palette — searches apps, projects and links |
-| `⌘W` | Close the front window |
-| `⌘M` | Minimise the front window |
-| `⌘↵` | Maximise or restore the front window |
-| `⌘←` `⌘→` | Snap the front window to a half |
-| `⌘1`…`⌘5` | Work, Lab, Build log, Now, Terminal |
-| `⌘,` | Settings |
-| `F2` | Mission Control |
+| `W` `A` `S` `D` / arrows | Walk (relative to the camera) |
+| `Shift` | Run |
+| `Space` | Jump — there is coyote time and a jump buffer, so it forgives you |
+| `E` / `Enter` | Interact with whatever the ring on the ground is under |
+| Click / tap the ground | Walk there |
+| Drag | Orbit the camera · wheel or pinch to zoom |
+| `M` | Map, with fast travel |
+| `J` | Quest log |
+| `Esc` | Close the panel · pause |
 | `R` | Recruiter Mode |
-| `Esc` | Close the front window |
-| `↑` `↓` in the terminal | Command history |
-| `↑ ↑ ↓ ↓ ← → ← → B A` | Something |
+| `↑ ↑ ↓ ↓ ← → ← → B A` | Still something |
 
-Shortcuts are defined once in `src/lib/shortcuts.ts` and Settings renders that same list, so
-the documentation cannot drift from the handler.
+Phones get a thumbstick (push it all the way to run), **A** to interact and **B** to jump.
 
-Terminal commands: `help`, `apps`, `open <app>`, `projects`, `skills`, `whoami`, `neofetch`,
-`api`, `theme`, `github`, `linkedin`, `email`, `resume`, `clear`. Two are not in `help`.
+## The island
 
-## The room
+| Place | What's there | Opens |
+| --- | --- | --- |
+| The Studio | Desk, CRT, bookshelf, my ID card on the wall | THARUN OS (the computer), ME |
+| The Workshop | A hologram per published project, a workbench, a live billboard | Case files, WORK, the in-OS browser |
+| The Lab | A glass dome, one orb per open question, coloured by status | LAB |
+| The Long Road | One stone per build-log entry, oldest first; each lights as you pass | BUILD LOG |
+| The Arcade | One cabinet per part of the stack — and crates up to the roof | STACK |
+| Radio Tower | A radio desk and a proof plaque | CONTACT, PROOF |
+| Notice Board | What I'm doing this month | NOW |
 
-The wallpaper is a room — desk, CRT, sunset window, plant, and a figure at the right — drawn as
-original pixel art in [`Scene.tsx`](src/components/os/Scene.tsx). It is plain `<rect>`s on a
-320×180 grid with `shape-rendering: crispEdges`, so it scales up chunky rather than blurry. No
-image files, no sprite sheets, nothing traced from anyone else's site.
+Every one of those is generated from `src/data`. Publish a project and a hologram appears; add a
+build-log entry and the road grows a stone. Nothing about content lives in a 3D component.
 
-The figure is a **stylised character, not a portrait** — swap `Character` for an `<image>` if you
-want a real pixel avatar of yourself.
+Opening anything docks a panel on the right and frames me on the left. The panels are the OS apps
+themselves, running on their own window store — so WORK → case file → back works exactly as it does
+on the desktop, with no second implementation.
 
-Desktop icons sit on top in a grid: single click selects, double click opens.
+There are achievements, five floating commits hidden around the island (each one carries a real line
+from the build log), a time of day that follows your clock, and a curtain call at 100%.
 
-## He lives here
+## The character
 
-After the welcome film plays once, TharunBOT drops into **ambient mode** — an ongoing life in
-[`life.ts`](src/lib/life.ts) rather than the same fifteen seconds forever.
+`art/build_tharun.py` builds me in Blender from code — mesh, an 18-bone rig, computed skin weights and
+nine animations (idle, walk, run, jump, fall, land, wave, interact, victory) — and exports
+`public/models/tharun.glb`. `art/build_props.py` does the same for the CRT, keyboard and mouse.
 
-Five anchors (desk, whiteboard, shelf, couch, window) and a set of activities with real durations.
-Which one comes next is weighted by **the actual hour** — coffee in the morning, notes in the
-evening, "one more fix, famous last words" at night — and nudged by what you have been reading, so
-a visitor who lives in the Lab sees more whiteboard time.
+```powershell
+# Windows; set BLENDER_PATH to use a non-Store install
+powershell -File art/run-blender.ps1 -Script art/build_tharun.py
+```
 
-Movement has anticipation: **notice → turn → walk → settle**, never a teleport. He blinks on an
-irregular cadence, breathes by a single pixel, and most activities pass in complete silence. A
-thought appears maybe 45% of the time, in a quieter dashed bubble that is his, not speech to you.
+The look is the `LOOK` block at the top of the script — hair style, skin, shirt, trousers, shoes,
+glasses, beard. Change it and re-run; the game picks up the new GLB on reload. If the model ever fails
+to load, a procedural stand-in made of primitives takes its place.
 
-Opening anything pauses all of it. He was here before you arrived and carries on after.
+## How it is put together
 
-## The 15-second loop
+```
+src/
+  app/page.tsx              the game entry + a server-rendered summary for crawlers and no-JS
+  data/                     all content — edit these, never the components
+  game/                     the rules, no React rendering
+    store.ts                mode machine (title → intro → play ⇄ OS), quests, settings, save file
+    zones.ts                places and interactables, derived from src/data
+    terrain.ts              the island as one height function: mesh, collider and props all ask it
+    controller.ts           Rapier core's kinematic character controller, configured
+    runtime.ts              per-frame state (player, camera, input) outside React
+    audio.ts                generative music + every sound effect, in Web Audio
+    sky.ts, quality.ts, quests.ts, input.ts, experience.ts, useGameBot.ts
+  components/game/
+    GameEntry.tsx           game or classic OS; the 3D stack is its own lazy chunk
+    GameRoot.tsx            canvas + HUD + panels + OS, glued to the store
+    Player.tsx              velocity, gravity, coyote time, jump buffer, respawn
+    CameraRig.tsx           follow, orbit, wall pull-in, scripted shots, the dive into the CRT
+    Character.tsx           the GLB, crossfading clips from the controller state
+    world/                  island, sea, sky, foliage, every place, sensors, life
+    hud/                    title, HUD, panel, menus, map, toasts, touch controls, OS screen
+  components/os/, apps/     THARUN OS — unchanged apps, reused by the game panels
+art/                        Blender build scripts and their .blend output
+```
 
-Five scenes, three seconds each — WAKE, DISCOVER, BUILD, THINK, INVITE — defined in
-[`cinematic.ts`](src/lib/cinematic.ts). The character walks between marks with a two-frame leg
-cycle, the camera reframes, and the light shifts from morning through to night. **The OS chrome
-never moves**; only the world layer animates underneath it.
+**The player** is a kinematic capsule we move ourselves. Velocity, gravity, coyote time and the jump
+buffer are ours; Rapier's `KinematicCharacterController` (from `@dimforge/rapier3d-compat`, not a React
+wrapper) only answers "if I try to move this far, how far do I get?" — which is what gives slopes,
+autostep over porch steps and snapping to the ground on the way down. Fall off the island and you are
+put back where you last stood safely.
 
-The rule that matters: **the visitor always wins**. Open a window, the palette, Mission Control,
-Recruiter or Developer Mode and the loop pauses exactly where it is. It resumes only when the desk
-is clear again. `SKIP INTRO` is remembered, so returning visitors never see it twice, and
-`prefers-reduced-motion` disables it outright.
+**Triggers** are Rapier sensors — zones, interactables and commits in one fixed body. The player's
+collider opts into kinematic↔fixed events, which Rapier leaves off by default.
 
-## Spaces
+**TharunBOT** still talks: the same line table in `src/lib/bot.ts` drives a bubble over my head, with
+island events (`zone:workshop`, `collect`, `fall`, …) next to the OS ones.
 
-Three desks — Personal, Work, Lab — switched with `Ctrl+1/2/3` or the menu bar. Windows belong to
-the desk they were opened on, so the same app can be open on two desks at once, and each desk has
-its own light. Close-all only closes the desk you're standing at.
+**The OS** boots inside the game: the camera dives into the CRT, the glass flashes, and the full
+desktop mounts on top. The canvas stops rendering while it is up; "Back to the island" (or `Esc` on an
+empty desk) plays it in reverse.
 
-## Developer Mode
+## Performance
 
-Press `D`. A live read-out of the running app: the process tree of open windows with sizes and
-z-order, the runtime, the content-model counts straight out of `src/data`, the public API, and the
-current relationship tier. Every number is read at render time — if one is wrong, the site is wrong.
+- Three presets (Low / Medium / High) — shadows, post-processing, grass density, pixel ratio. Auto
+  picks one from the device and a performance monitor steps down if frames drop.
+- Foliage, rocks, birds and dust are instanced; one shadow-casting light follows the player.
+- Bloom is driven by materials (anything brighter than 1 glows), not by masks.
+- Rendering stops while the OS or Recruiter Mode is open.
+- The first page load does not include three.js or Rapier.
 
-## Atmosphere
+## THARUN OS
 
-One WebGL fragment shader draws drifting dust, a soft window shaft and film grain over the SVG
-room ([`Atmosphere.tsx`](src/components/os/Atmosphere.tsx)). It is additive only — no library, half
-resolution, paused on a hidden tab, and skipped entirely without WebGL or under reduced motion. The
-room is still vector art underneath.
-
-## TharunBOT
-
-The character is a behaviour engine, not decoration — [`src/lib/bot.ts`](src/lib/bot.ts) holds a
-data-driven line table, and [`TharunBot.tsx`](src/components/os/TharunBot.tsx) draws it.
-
-Lines are matched on events (`open:lab`, `hover:work`, `idle`, `enter`, `return`), and the rules
-are what keep it from being irritating:
-
-- one bubble at a time, highest priority wins
-- a reaction always beats ambient chatter
-- ambient lines fire every ~32s at most and never repeat back to back
-- `once` lines fire a single time per session
-- `prefers-reduced-motion` silences ambient lines and the cursor tracking entirely
-
-It also escalates. Open three different apps and the `explorer` flag unlocks a second tier of
-lines — the Lab stops saying "these are unresolved questions" and starts saying "you're actually
-reading this". First-time visitors get a greeting; returning ones just get "Welcome back."
-
-Adding dialogue means adding an object to `LINES`. Nothing else changes.
-
-## The browser
-
-`BROWSER` in the dock opens an in-OS browser with back / forward / reload, an address bar and
-bookmarks for **Claxon AI**, **BrandThis** and **Softdigit Consulting** — all three verified to
-load inside a frame. Sites are listed in [`src/data/sites.ts`](src/data/sites.ts).
-
-A cross-origin frame cannot be inspected, so a blocked site looks identical to a slow one. After
-six seconds the browser offers a real tab instead of leaving a white rectangle. GitHub and
-LinkedIn both send `X-Frame-Options`, which is why they are not bookmarked.
-
-## The OS layer
-
-Drag a window to a screen edge and it snaps, with a translucent panel previewing where it lands.
-Right-click the desktop for a context menu. `F2` opens Mission Control. Settings carries three
-themes — Charcoal, Paper, Midnight — that reskin everything with no reload; the choice is applied
-in `<head>` before first paint, so there is no flash on the way back.
-
-The workspace is remembered. Move a window, resize it, snap it, refresh: it comes back as you left
-it, from `localStorage` under `tharun-os-session-v1`.
+Still all there, in the studio computer and at `/?classic=1`: draggable windows, dock, `⌘K` palette,
+terminal, Mission Control (`F2`), three desks (`Ctrl+1/2/3`), Developer Mode (`D`), themes, session
+memory, the pixel-art room and TharunBOT's life in it. Shortcuts live in `src/lib/shortcuts.ts`.
 
 ## The portfolio has an API
 
@@ -151,61 +150,37 @@ curl http://localhost:3000/api/portfolio
 curl "http://localhost:3000/api/portfolio?q=projects"
 ```
 
-Sections: `projects`, `experience`, `stack`, `buildLog`, `now`, `openQuestions`, `education`.
-It reads the same `src/data` files the UI renders, so there is no second source of truth.
+Sections: `projects`, `experience`, `stack`, `buildLog`, `now`, `openQuestions`, `education`. It reads
+the same `src/data` files as everything else.
 
 ## Editing the content
 
-**All content lives in `src/data/`. You should never need to touch a component to change
-what the site says.**
+**All content lives in `src/data/`.**
 
 | File | Holds |
 | --- | --- |
-| `profile.ts` | Name, headline, intro, status line, stack, the NOW page, contact details |
-| `projects.ts` | Projects and their case studies, plus experience and education |
+| `profile.ts` | Name, headline, intro, status, stack, the NOW page, contact details |
+| `projects.ts` | Projects and case studies, experience and education |
 | `journal.ts` | Build log, Lab questions, Failure Museum, Notes |
 | `proof.ts` | The checkable numbers and live deployment links |
 
-Three rules the code enforces so nothing half-finished ships:
+- A project with `published: false` is invisible everywhere — the island, the OS, the palette.
+- A project with an empty `study: []` gets a hologram that opens WORK instead of a case file.
+- `LAB`, `NOTES` and `FAILURE_MUSEUM` hide themselves while their arrays are empty.
 
-- A project with `published: false` is invisible everywhere — the site, the palette, the terminal.
-- A project with an empty `study: []` renders as a card with links but no case file.
-- `LAB`, `NOTES` and `FAILURE_MUSEUM` hide themselves from the dock while their arrays are empty.
+To add a place: put it in `LAYOUT` (`src/game/terrain.ts`) so the ground flattens under it, give it a
+zone and interactables in `src/game/zones.ts`, and a component in `src/components/game/world/`.
 
 ### Still to fill in
 
-- `projects.ts` — the **Claxon AI** entry is a stub with `published: false`. Nothing about it was
-  invented; fill it in and flip the flag.
-- `journal.ts` — `failures` and `notes` are empty, with templates in the comments. The Failure
-  Museum is the section almost nobody else will have.
-- `public/` — a `resume.pdf` would be better than the `.docx` that is there now. Drop one in and
-  point `contact.resume` at `/resume.pdf`.
+- `art/build_tharun.py` — the `LOOK` block is the TharunBOT palette. Send a photo or a description and
+  it becomes me.
+- `projects.ts` — the **XR work at Ingage** entry is a stub with `published: false`.
+- `journal.ts` — `failures` and `notes` are empty, with templates in the comments.
+- `public/` — a `resume.pdf` would be better than the `.docx`. Drop one in and point
+  `contact.resume` at `/resume.pdf`.
 
 ## Deploying
 
-Static, so anywhere works. Vercel:
-
-```bash
-npx vercel
-```
-
-Then set `NEXT_PUBLIC_SITE_URL` to the live domain so Open Graph tags resolve absolutely.
-
-## Structure
-
-```
-src/
-  app/            layout, page, global CSS, favicon
-  data/           all content — edit these
-  lib/
-    apps.ts       the app registry (dock order, sizes, search keywords, visibility)
-    os.tsx        window manager: open/close/focus/move/resize/maximise
-  components/
-    os/           Shell, Boot, MenuBar, Dock, Window, Desktop, CommandPalette, MobileShell, Konami
-    apps/         the contents of each window
-    modes/        Recruiter Mode
-```
-
-The window manager is a `useReducer` in `lib/os.tsx`. Windows are plain absolutely-positioned
-elements; dragging and resizing use pointer capture, and window bodies are memoised so dragging
-one does not re-render what is inside it.
+Static, so anywhere works. Vercel: `npx vercel`, then set `NEXT_PUBLIC_SITE_URL` to the live domain so
+Open Graph tags resolve absolutely.

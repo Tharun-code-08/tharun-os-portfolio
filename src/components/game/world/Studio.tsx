@@ -2,13 +2,14 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
+import { useGLTF } from "@react-three/drei";
 import { CuboidCollider, RigidBody } from "@react-three/rapier";
 import { CanvasTexture, Color, MeshBasicMaterial, SRGBColorSpace, type PointLight } from "three";
 import { profile } from "@/data/profile";
-import { PAL, toon } from "@/game/materials";
+import { PAL, toon, toonify } from "@/game/materials";
 import { liveSky } from "@/game/sky";
 import { useGame } from "@/game/store";
-import { STUDIO } from "@/game/zones";
+import { MONITOR, STUDIO } from "@/game/zones";
 import { Box, Cyl, FONT_MONO, Label } from "./kit";
 import { Cutaway } from "./Cutaway";
 
@@ -62,6 +63,30 @@ function useScreen() {
 
   return texture;
 }
+
+const PROPS = "/models/props.glb";
+
+/** CRT, keyboard and mouse, placed on the desk (desk-top is y = 0.797). */
+function Computer() {
+  const { nodes } = useGLTF(PROPS);
+  const parts = useMemo(
+    () => ({
+      crt: toonify(nodes.crt.clone()),
+      keyboard: toonify(nodes.keyboard.clone()),
+      mouse: toonify(nodes.mouse.clone()),
+    }),
+    [nodes],
+  );
+  return (
+    <>
+      <primitive object={parts.crt} position={[0, 0.797, -0.02]} />
+      <primitive object={parts.keyboard} position={[0, 0.797, 0.27]} rotation-y={0.02} />
+      <primitive object={parts.mouse} position={[0.43, 0.797, 0.28]} rotation-y={-0.2} />
+    </>
+  );
+}
+
+useGLTF.preload(PROPS);
 
 export function Studio() {
   const [cx, cz] = STUDIO.center;
@@ -179,14 +204,11 @@ export function Studio() {
         ].map(([x, z]) => (
           <Box key={`${x}${z}`} size={[0.07, 0.76, 0.07]} position={[x, 0.38, z]} color={PAL.woodDark} />
         ))}
-        {/* CRT */}
-        <Box size={[0.3, 0.06, 0.3]} position={[0, 0.82, -0.04]} color={PAL.metal} />
-        <Box size={[0.64, 0.54, 0.5]} position={[0, 1.12, -0.04]} color="#d9d2c4" />
-        <Box size={[0.5, 0.42, 0.3]} position={[0, 1.12, -0.36]} color="#c9c2b4" />
-        <mesh position={[0, 1.12, 0.214]} material={mats.screen}>
+        {/* The computer — modelled in Blender (art/build_props.py). */}
+        <Computer />
+        <mesh position={[0, MONITOR.y - f, MONITOR.z - STUDIO.desk[1]]} material={mats.screen}>
           <planeGeometry args={[0.5, 0.39]} />
         </mesh>
-        <Box size={[0.6, 0.06, 0.2]} position={[0, 0.81, 0.3]} color="#e8e2d6" />
         {/* Lamp */}
         <Cyl r={0.12} h={0.03} position={[-0.7, 0.8, -0.15]} color={PAL.metal} />
         <Cyl r={0.015} h={0.45} position={[-0.7, 1.02, -0.15]} color={PAL.metal} />

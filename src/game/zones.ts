@@ -78,8 +78,8 @@ export const STUDIO = {
 /** The CRT on the desk: centre of the glass, facing +z. The camera dives here. */
 export const MONITOR = {
   x: STUDIO.desk[0],
-  y: STUDIO.floor + 1.12,
-  z: STUDIO.desk[1] + 0.215,
+  y: STUDIO.floor + 1.097,
+  z: STUDIO.desk[1] + 0.214,
 };
 
 /** The arcade canopy: a flat roof you can reach by climbing the crates. */

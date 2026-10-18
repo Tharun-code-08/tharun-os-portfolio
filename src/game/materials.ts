@@ -3,6 +3,9 @@
 import {
   type BufferGeometry,
   Color,
+  Mesh,
+  MeshStandardMaterial,
+  type Object3D,
   DataTexture,
   MeshBasicMaterial,
   MeshToonMaterial,
@@ -131,4 +134,34 @@ void main() {
   };
   m.customProgramCacheKey = () => `nearFade-${near}-${far}`;
   return m;
+}
+
+/**
+ * Swap the PBR materials a GLB arrives with for the island's toon look,
+ * keeping colour and emission (screens and LEDs stay lit, and bloom).
+ */
+export function toonify(root: Object3D, opts: { shadows?: boolean } = {}) {
+  const cache = new Map<string, MeshToonMaterial>();
+  const swap = (m: MeshStandardMaterial) => {
+    let t = cache.get(m.uuid);
+    if (!t) {
+      t = new MeshToonMaterial({ color: m.color, gradientMap: toonGradient(), name: m.name });
+      if (m.emissive && m.emissive.getHex() !== 0) {
+        t.emissive.copy(m.emissive);
+        t.emissiveIntensity = Math.max(2, m.emissiveIntensity);
+        t.toneMapped = false;
+      }
+      cache.set(m.uuid, t);
+    }
+    return t;
+  };
+  root.traverse((o) => {
+    if (!(o instanceof Mesh)) return;
+    o.castShadow = opts.shadows ?? true;
+    o.receiveShadow = true;
+    o.material = Array.isArray(o.material)
+      ? o.material.map((m) => swap(m as MeshStandardMaterial))
+      : swap(o.material as MeshStandardMaterial);
+  });
+  return root;
 }

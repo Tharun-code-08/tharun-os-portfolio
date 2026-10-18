@@ -3,9 +3,9 @@
 import { Component, Suspense, useEffect, useMemo, useRef, type ReactNode } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useAnimations, useGLTF } from "@react-three/drei";
-import { LoopOnce, LoopRepeat, Mesh, MeshStandardMaterial, MeshToonMaterial, type AnimationAction, type Group } from "three";
+import { LoopOnce, LoopRepeat, Mesh, MeshToonMaterial, type AnimationAction, type Group } from "three";
 import { clone as cloneSkinned } from "three/examples/jsm/utils/SkeletonUtils.js";
-import { toonGradient } from "@/game/materials";
+import { toonify } from "@/game/materials";
 import { runtime, type Anim } from "@/game/runtime";
 import { ProceduralCharacter } from "./ProceduralCharacter";
 
@@ -40,27 +40,14 @@ function Model() {
 
   // A private copy (skeletons can't be shared) with the toon look applied.
   const model = useMemo(() => {
-    const clone = cloneSkinned(scene) as Group;
-    const grad = toonGradient();
-    const cache = new Map<string, MeshToonMaterial>();
+    const clone = toonify(cloneSkinned(scene) as Group);
     clone.traverse((o) => {
-      if (!(o instanceof Mesh)) return;
-      o.castShadow = true;
-      o.receiveShadow = true;
+      // Skinned bounds don't follow the animation; never cull him.
       o.frustumCulled = false;
-      const swap = (m: MeshStandardMaterial) => {
-        let t = cache.get(m.name);
-        if (!t) {
-          t = new MeshToonMaterial({ color: m.color, gradientMap: grad, name: m.name });
-          // Eyes keep a little life in them.
-          if (m.name === "Glint") t.emissive.set("#ffffff");
-          cache.set(m.name, t);
-        }
-        return t;
-      };
-      o.material = Array.isArray(o.material)
-        ? o.material.map((m) => swap(m as MeshStandardMaterial))
-        : swap(o.material as MeshStandardMaterial);
+      // Eyes keep a little life in them.
+      if (o instanceof Mesh && !Array.isArray(o.material) && o.material.name === "Glint") {
+        (o.material as MeshToonMaterial).emissive.set("#ffffff");
+      }
     });
     return clone;
   }, [scene]);
