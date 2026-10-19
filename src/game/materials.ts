@@ -98,8 +98,8 @@ export const PAL = {
   trunk: "#6d4c30",
   accent: "#ffb020",
   red: "#b83b34",
-  skin: "#c98c5e",
-  hair: "#221812",
+  skin: "#c68660",
+  hair: "#1c1416",
   shoe: "#ece7de",
 } as const;
 

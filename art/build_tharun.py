@@ -22,27 +22,32 @@ from mathutils import Vector
 
 # ----------------------------------------------------------------- look -----
 
-# Tharun, as described by Tharun: textured hair with volume on top, medium
-# brown skin, glasses, stubble and a moustache, black tee and jeans.
+# Tharun, from his GitHub photo: a tall quiff swept up and back with a few
+# strands over the forehead, short sides, thick brows, medium-brown skin, a
+# short beard that is fullest on the chin, and a thin moustache. The outfit
+# is the game's: black tee with the amber T, jeans, white sneakers.
 LOOK = {
-    "skin": "#c98c5e",
-    "skin_shadow": "#a87049",
-    "hair": "#1c1410",
-    "hair_style": "textured",  # "textured" | "fringe" | "spiky"
+    "skin": "#c68660",
+    "skin_shadow": "#a56b4b",
+    "hair": "#1c1416",
+    "hair_style": "quiff",  # "quiff" | "textured" | "fringe" | "spiky"
+    "brows": "thick",  # "thin" | "thick"
     "eyes": "#15151b",
     "shirt": "#26262d",
     "shirt_logo": "#ffb020",
     "pants": "#3d5d8c",
     "shoes": "#ece7de",
     "soles": "#3a3a40",
-    "glasses": True,
+    "glasses": False,
     "glasses_frame": "#141418",
     "beard": "stubble",  # False | "stubble" | "full"
     # Stubble is a darker shade of the skin, not a hair colour; a full beard
     # would use something close to "hair".
     "beard_color": "#7a5139",
-    "moustache": True,
-    "moustache_color": "#2e211b",
+    "chin_beard": True,  # a denser patch on the chin, over the stubble
+    "chin_beard_color": "#5a3e31",
+    "moustache": "thin",  # False | "thin" | "full"
+    "moustache_color": "#4a3229",
 }
 
 # --------------------------------------------------------------- setup ------
@@ -171,6 +176,18 @@ def ellipsoid(name, center, radii, material, u=20, v=14, smooth=True):
     for vert in bm.verts:
         vert.co = Vector((vert.co.x * radii[0], vert.co.y * radii[1], vert.co.z * radii[2])) + Vector(center)
     return new_object(name, bm, material, smooth)
+
+
+def blob(name, center, radii, rot, material, u=16, v=10):
+    """An ellipsoid turned by an XYZ Euler (radians) — hair masses."""
+    from mathutils import Euler
+
+    m = Euler(rot, "XYZ").to_matrix()
+    bm = bmesh.new()
+    bmesh.ops.create_uvsphere(bm, u_segments=u, v_segments=v, radius=1.0)
+    for vert in bm.verts:
+        vert.co = m @ Vector((vert.co.x * radii[0], vert.co.y * radii[1], vert.co.z * radii[2])) + Vector(center)
+    return new_object(name, bm, material, True)
 
 
 def sweep(name, points, radius, material, closed=False, segs=8, plane_normal=(0.0, 1.0, 0.0), radii=None):
@@ -308,7 +325,7 @@ H = {
 }
 LEG_X = 0.115
 ARM_X = 0.255
-HEAD_R = (0.285, 0.265, 0.275)
+HEAD_R = (0.28, 0.265, 0.285)
 
 # Each part says which bones may move it, so weights are computed, not painted.
 PARTS = []
@@ -416,7 +433,12 @@ def build_head():
         part(ellipsoid(f"eye.{s}", e, (0.03, 0.02, 0.045), eyes, 12, 8), ("head", None))
         part(ellipsoid(f"glint.{s}", e + Vector((0.008 * s, -0.016, 0.018)), (0.009, 0.006, 0.01), mat("Glint", "#ffffff", 0.2), 6, 4), ("head", None))
         # Brows.
-        part(box(f"brow.{s}", c + Vector((0.095 * s, -ry * 0.93, 0.072)), (0.07, 0.018, 0.016), hair, bevel=0.005), ("head", None))
+        if LOOK.get("brows") == "thick":
+            # Thick, slightly arched: higher at the inner end, tapering out.
+            brow = [on_face((0.052 + 0.075 * t) * s, 0.078 + 0.012 * math.sin(t * math.pi) - 0.012 * t, 0.006, c, (rx, ry, rz)) for t in (0.0, 0.33, 0.66, 1.0)]
+            part(sweep(f"brow.{s}", brow, 0.0, hair, radii=[0.014, 0.014, 0.012, 0.008]), ("head", None))
+        else:
+            part(box(f"brow.{s}", c + Vector((0.095 * s, -ry * 0.93, 0.072)), (0.07, 0.018, 0.016), hair, bevel=0.005), ("head", None))
     # Mouth: a small dark line, slight smile.
     mouth_z = -0.118 if LOOK.get("moustache") else -0.095
     part(smile("mouth", on_face(0.0, mouth_z, -0.004, c, (rx, ry, rz)), mat("Mouth", "#6a3226"), width=0.064, depth=0.018), ("head", None))
@@ -426,9 +448,10 @@ def build_head():
     bmesh.ops.create_uvsphere(bm, u_segments=48, v_segments=30, radius=1.0)
     for vert in bm.verts:
         vert.co = Vector((vert.co.x * rx * 1.07, vert.co.y * ry * 1.08, vert.co.z * rz * 1.06)) + c
-    textured = LOOK["hair_style"] == "textured"
-    # Textured: hairline sits higher and the sides are a tight fade.
-    hairline = 0.15 if textured else 0.11
+    style = LOOK["hair_style"]
+    textured = style in ("textured", "quiff")
+    # Textured / quiff: hairline sits higher and the sides are cut short.
+    hairline = {"textured": 0.15, "quiff": 0.135}.get(style, 0.11)
     face_cut = [v for v in bm.verts if (v.co.y - c.y) < -0.06 and (v.co.z - c.z) < hairline]
     low_cut = [v for v in bm.verts if (v.co.z - c.z) < (-0.12 if (v.co.y - c.y) > 0.05 else -0.02)]
     if textured:
@@ -443,8 +466,25 @@ def build_head():
     mod.thickness = 0.02
     part(cap, ("head", None))
 
-    # Fringe / spikes, depending on the style.
-    style = LOOK["hair_style"]
+    # Quiff, fringe or spikes, depending on the style.
+    if style == "quiff":
+        # One smooth mass rather than strands: a body over the top tilted so
+        # the front rises, a tall roll along the hairline that leans a little
+        # to his left, and a few long ridges on top for texture. Swept up and
+        # back, tallest at the front, as in the photo.
+        tilt = -0.35
+        part(blob("quiff.mass", c + Vector((0.015, -0.07, 0.265)), (0.24, 0.215, 0.135), (tilt, 0.0, 0.0), hair, 22, 14), ("head", None))
+        part(blob("quiff.front", c + Vector((0.025, -0.2, 0.255)), (0.215, 0.1, 0.12), (-0.15, 0.0, 0.06), hair, 22, 12), ("head", None))
+        for k, (x, turn) in enumerate(((-0.13, 0.12), (-0.045, 0.05), (0.045, -0.02), (0.13, -0.1))):
+            z = 0.33 - abs(x) * 0.42
+            part(blob(f"quiff.ridge.{k}", c + Vector((x, -0.08, z)), (0.065, 0.2, 0.065), (tilt - 0.1, 0.0, turn), hair, 14, 10), ("head", None))
+        # A soft swoop of hair falls over the forehead on his right.
+        part(blob("fringe.0", c + Vector((-0.115, -0.258, 0.165)), (0.105, 0.03, 0.042), (0.15, 0.75, 0.2), hair, 16, 10), ("head", None))
+        part(blob("fringe.1", c + Vector((-0.05, -0.27, 0.19)), (0.07, 0.026, 0.032), (0.15, 0.55, 0.1), hair, 14, 8), ("head", None))
+        # Back of the head: hair lies flat, swept back and down.
+        for k, x in enumerate((-0.13, 0.0, 0.13)):
+            path = [(x, 0.06, 0.29), (x * 1.1, 0.2, 0.2), (x * 1.05, 0.255, 0.06)]
+            part(sweep(f"back.{k}", [c + Vector(p) for p in path], 0.0, hair, segs=10, radii=[0.06, 0.055, 0.035]), ("head", None))
     if style == "textured":
         # Three rows of chunky clumps: a front quiff that lifts up and
         # forward, a full middle, and a back row swept back.
@@ -476,7 +516,9 @@ def build_head():
             tip = base + Vector((math.cos(a) * 0.08, math.sin(a) * 0.08 + 0.05, 0.12))
             part(lathe(f"spike.{i}", base, tip, [(0.0, 0.07), (1.0, 0.01)], hair, segs=6, smooth=False), ("head", None))
     # A little volume on the crown so the silhouette reads as hair, not a helmet.
-    if style == "textured":
+    if style == "quiff":
+        part(ellipsoid("hair.crown", c + Vector((0.01, -0.03, 0.235)), (0.235, 0.23, 0.12), hair, 18, 10), ("head", None))
+    elif style == "textured":
         part(ellipsoid("hair.crown", c + Vector((0.0, -0.01, 0.215)), (0.225, 0.215, 0.12), hair, 16, 10), ("head", None))
     else:
         part(ellipsoid("hair.crown", c + Vector((0.0, 0.03, 0.2)), (0.2, 0.18, 0.11), hair, 14, 8), ("head", None))
@@ -517,16 +559,40 @@ def build_head():
             "beard",
             c,
             radii,
-            1.03 if full else 1.016,
+            1.03 if full else 1.008,
             deg(98),
             lambda phi: keyed(top_keys, abs(phi)),
             lambda phi: keyed(bottom_keys, abs(phi)),
             beard,
         )
-        sol = b.modifiers.new("thick", "SOLIDIFY")
-        sol.thickness = 0.022 if full else 0.007
-        sol.offset = 1.0
+        if full:
+            sol = b.modifiers.new("thick", "SOLIDIFY")
+            sol.thickness = 0.022
+            sol.offset = 1.0
         part(b, ("head", None))
+
+    if LOOK.get("chin_beard"):
+        # Fullest on the chin: from under the lip down and around the chin,
+        # thinning out toward the jaw.
+        deg = math.radians
+        chin_top = [(0, -0.162), (deg(10), -0.165), (deg(24), -0.19), (deg(40), -0.225), (deg(58), -0.245)]
+        chin_bottom = [(0, -rz * 0.998), (deg(30), -rz * 0.99), (deg(58), -0.25)]
+        cb = head_band(
+            "beard.chin",
+            c,
+            radii,
+            1.014,
+            deg(58),
+            lambda phi: keyed(chin_top, abs(phi)),
+            lambda phi: keyed(chin_bottom, abs(phi)),
+            mat("ChinBeard", LOOK.get("chin_beard_color", LOOK["hair"]), 0.95),
+            nu=32,
+            nv=8,
+        )
+        sol = cb.modifiers.new("thick", "SOLIDIFY")
+        sol.thickness = 0.008
+        sol.offset = 1.0
+        part(cb, ("head", None))
 
     if LOOK.get("moustache"):
         hair_m = mat("Moustache", LOOK.get("moustache_color", LOOK["hair"]), 0.95)
@@ -536,7 +602,8 @@ def build_head():
             x = t * 0.058
             z = -0.082 - 0.016 * t * t
             pts.append(on_face(x, z, 0.012, c, radii))
-            rads.append(0.0075 + 0.0075 * (1 - t * t))
+            thin = LOOK["moustache"] == "thin"
+            rads.append((0.004 + 0.004 * (1 - t * t)) if thin else (0.0075 + 0.0075 * (1 - t * t)))
         part(sweep("moustache", pts, 0.012, hair_m, radii=rads), ("head", None))
 
 

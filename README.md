@@ -82,9 +82,10 @@ nine animations (idle, walk, run, jump, fall, land, wave, interact, victory) —
 powershell -File art/run-blender.ps1 -Script art/build_tharun.py
 ```
 
-The look is the `LOOK` block at the top of the script — textured hair with volume on top, medium-brown
-skin, rectangular glasses, stubble along the jaw and a moustache, a black tee with the amber T, jeans
-and white sneakers. Change any of it and re-run; the game picks up the new GLB on reload. The pixel
+The look is the `LOOK` block at the top of the script, taken from my GitHub photo: a tall quiff swept
+up and back with a fringe falling on the right, short sides, thick brows, medium-brown skin, a short
+beard that is fullest on the chin and a thin moustache, with the game outfit of a black tee with the
+amber T, jeans and white sneakers. Change any of it and re-run; the game picks up the new GLB on reload. The pixel
 TharunBOT in the OS (`src/components/os/TharunBot.tsx`) wears the same outfit. If the model ever fails
 to load, a procedural stand-in made of primitives takes its place.
 
