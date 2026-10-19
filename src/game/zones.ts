@@ -203,11 +203,11 @@ export const INTERACTABLES: Interactable[] = [
   {
     id: "live",
     zone: "workshop",
-    label: "Live: BrandThis",
+    label: "Live: PitchMyWeb",
     verb: "Open it in the browser",
     position: at(LAYOUT.workshop[0] - 7, LAYOUT.workshop[1] + 5, 1.6),
     reach: 2,
-    action: { kind: "app", app: "browser", payload: sites[1]?.id, title: "BROWSER" },
+    action: { kind: "app", app: "browser", payload: (sites.find((s) => s.id === "pitchmyweb") ?? sites[0])?.id, title: "BROWSER" },
   },
   {
     id: "lab-console",

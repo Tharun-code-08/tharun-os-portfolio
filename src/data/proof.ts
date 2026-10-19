@@ -16,7 +16,7 @@ export function monthsShipping(from: Date = new Date()): number {
 }
 
 export const liveDeployments = [
-  { label: "BrandThis", href: "https://brandthis.in", note: "Brand intelligence SaaS" },
+  { label: "PitchMyWeb", href: "https://pitchmyweb.in", note: "Lead-to-pitch SaaS, live" },
   { label: "Softventory", href: "https://softdigitconsulting.com/", note: "Enterprise SaaS, in production" },
   {
     label: "Mini Playground",
@@ -33,9 +33,9 @@ export function proofStats(now: Date = new Date()) {
       note: "Writing production software continuously since January 2026, after an AR/VR internship in mid-2025.",
     },
     {
-      value: "2",
-      label: "products in production",
-      note: "Softventory, an enterprise inventory SaaS, and BrandThis, live at brandthis.in.",
+      value: "3",
+      label: "products shipped",
+      note: "Softventory, an enterprise inventory SaaS; BrandThis at Claxon AI; and PitchMyWeb, live at pitchmyweb.in.",
     },
     {
       value: "10+",
@@ -48,7 +48,7 @@ export function proofStats(now: Date = new Date()) {
       note: "Every one links to source or to a live URL.",
     },
     {
-      value: "10",
+      value: "14",
       label: "public repositories",
       note: "Open on GitHub.",
     },

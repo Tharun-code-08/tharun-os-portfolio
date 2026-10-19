@@ -30,10 +30,15 @@ export function MeApp() {
           </p>
           <p>
             I led development on Softventory, an enterprise inventory management system — the
-            frontend, the backend, the multi-tenant architecture, and the deploy. Now I am at{" "}
-            <OutLink href="https://claxonai.in">Claxon AI</OutLink> building{" "}
-            <OutLink href="https://brandthis.in">BrandThis</OutLink>, which reads a company&rsquo;s
-            website and turns it into a Brand DNA a model can actually work from.
+            frontend, the backend, the multi-tenant architecture, and the deploy. At{" "}
+            <OutLink href="https://claxonai.in">Claxon AI</OutLink> I shipped two products: BrandThis,
+            which reads a company&rsquo;s website and turns it into a Brand DNA a model can actually
+            work from, and <OutLink href="https://pitchmyweb.in">PitchMyWeb</OutLink>, which finds
+            local businesses with no website and pitches them one over WhatsApp.
+          </p>
+          <p>
+            Now I freelance. Right now that means a quick-commerce app for a client, taken from the
+            scope and the quote all the way to the handover.
           </p>
           <p>
             It did not start with web. My first job was two months of AR, VR and XR development at

@@ -22,14 +22,66 @@ export type Project = {
 
 export const projects: Project[] = [
   {
-    id: "brandthis",
+    id: "pitchmyweb",
     index: "01",
+    name: "PitchMyWeb",
+    kind: "SaaS · live",
+    summary:
+      "Finds local businesses with no website, builds each one a real sample site, and pitches it from your own WhatsApp — so the business sees its website before anyone asks it to buy one.",
+    status: "shipped",
+    period: "Sep — Oct 2026",
+    role: "Built it end to end",
+    tech: [
+      "TypeScript",
+      "Next.js",
+      "Tailwind CSS",
+      "PostgreSQL",
+      "Prisma",
+      "Redis",
+      "BullMQ",
+      "Python",
+      "AWS",
+      "Terraform",
+      "Cloudflare",
+    ],
+    links: [
+      { label: "pitchmyweb.in", href: "https://pitchmyweb.in" },
+      { label: "claxonai.in", href: "https://claxonai.in" },
+    ],
+    published: true,
+    study: [
+      {
+        heading: "The problem",
+        body: [
+          "Selling websites to local businesses is an old, reliable freelance play, and a brutal one to run by hand: find a business with no site, build it something worth showing, record a demo, then message them and hope.",
+          "Each pitch costs hours before anyone has said a word back. Most people stop after a handful.",
+        ],
+      },
+      {
+        heading: "What it does",
+        body: [
+          "PitchMyWeb finds cafés, salons, clinics and the like that have reviews but no website, builds each one a real sample site from a library of templates, and sends the pitch from your own WhatsApp number. You only answer the replies.",
+          "Campaigns are paid per batch, with a refund if a batch comes up short.",
+        ],
+      },
+      {
+        heading: "How it is built",
+        body: [
+          "One npm workspace: a Next.js marketing site and dashboard, a Next.js API, a Python worker that discovers leads from Maps data, and a WhatsApp worker running each account's session and the sending queues on Redis and BullMQ. Postgres and Prisma underneath, shared by every service.",
+          "It runs on AWS, defined in Terraform, behind Cloudflare — DNS as code, Turnstile on sign-up, and the admin portal reachable only through Cloudflare Access. Payments, receipts and password resets are all wired, because a product people pay for has to handle the boring parts too.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "brandthis",
+    index: "02",
     name: "BrandThis",
-    kind: "AI SaaS · live",
+    kind: "AI SaaS · Claxon AI",
     summary:
       "Feed it a website once and it builds a reusable Brand DNA — colour system, typography, voice — so everything generated afterwards comes out on-brand instead of merely on-topic.",
-    status: "building",
-    period: "Aug 2026 — present",
+    status: "shipped",
+    period: "Aug — Sep 2026",
     role: "Full-stack feature work",
     tech: ["TypeScript", "Next.js", "React", "Tailwind CSS", "LLM APIs"],
     links: [
@@ -63,7 +115,7 @@ export const projects: Project[] = [
   },
   {
     id: "softventory",
-    index: "02",
+    index: "03",
     name: "Softventory",
     kind: "Enterprise SaaS · production",
     summary:
@@ -264,16 +316,28 @@ export type Job = {
 
 export const experience: Job[] = [
   {
+    company: "Freelance",
+    role: "Software Developer",
+    period: "Oct 2026 — Present",
+    location: "Chennai, India",
+    product: "Sites and apps for clients",
+    points: [
+      "Building a quick-commerce app for a client, taking it from scope and quote through to handover.",
+      "Taking on web and app work directly for clients.",
+    ],
+    published: true,
+  },
+  {
     company: "Claxon AI",
     role: "Software Development Intern",
-    period: "Aug 2026 — Present",
+    period: "Aug — Oct 2026",
     location: "Chennai, India",
     href: "https://claxonai.in",
-    product: "BrandThis — brand intelligence for generative work",
+    product: "BrandThis and PitchMyWeb",
     points: [
-      "Building BrandThis, the first standalone product out of the Claxon AI ecosystem: it reads a company's website and turns the visual, verbal and strategic signals behind it into a reusable Brand DNA.",
-      "Work spans the product surface — brand scanning, the workspace where a team's identity lives, and the generation flow that keeps ads, posts and product visuals on-brand across channels.",
-      "Claxon itself builds an agent runtime that connects models, data and existing tools so an agent finishes a task rather than recommending one; BrandThis applies the same idea to creative work.",
+      "Shipped BrandThis, the first standalone product out of the Claxon AI ecosystem: it reads a company's website and turns the visual, verbal and strategic signals behind it into a reusable Brand DNA, so generated ads, posts and product visuals stay on-brand.",
+      "Built PitchMyWeb end to end: lead discovery from Maps data, sample-site generation from a template library, and WhatsApp outreach from the user's own number, on Next.js, PostgreSQL, Redis/BullMQ and a Python worker.",
+      "Took it to production on AWS with Terraform behind Cloudflare, with paid campaigns, transactional email and an admin portal behind Cloudflare Access.",
     ],
     published: true,
   },

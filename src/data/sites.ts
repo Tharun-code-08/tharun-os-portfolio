@@ -18,13 +18,13 @@ export const sites: Site[] = [
     id: "claxon",
     label: "Claxon AI",
     url: "https://claxonai.in",
-    note: "Where I work — the agent runtime",
+    note: "Where I shipped BrandThis and PitchMyWeb",
   },
   {
-    id: "brandthis",
-    label: "BrandThis",
-    url: "https://brandthis.in",
-    note: "What I'm building right now",
+    id: "pitchmyweb",
+    label: "PitchMyWeb",
+    url: "https://pitchmyweb.in",
+    note: "Shipped Oct 2026 — find, build, pitch on WhatsApp",
   },
   {
     id: "softdigit",

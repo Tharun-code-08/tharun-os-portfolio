@@ -178,8 +178,6 @@ zone and interactables in `src/game/zones.ts`, and a component in `src/component
 
 - `projects.ts` — the **XR work at Ingage** entry is a stub with `published: false`.
 - `journal.ts` — `failures` and `notes` are empty, with templates in the comments.
-- `public/` — a `resume.pdf` would be better than the `.docx`. Drop one in and point
-  `contact.resume` at `/resume.pdf`.
 
 ## Deploying
 

@@ -116,7 +116,7 @@ export const LINES: Line[] = [
   {
     id: "browser",
     on: "open:browser",
-    text: "Those are live. Claxon and BrandThis are what I work on right now.",
+    text: "Those are live. PitchMyWeb is the last thing I shipped at Claxon.",
     emotion: "proud",
     pose: "point",
     priority: 70,

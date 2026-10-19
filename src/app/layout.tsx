@@ -23,7 +23,7 @@ const mono = JetBrains_Mono({
 });
 
 const description =
-  "Tharun Adhithya G S — software developer in Chennai. A playable portfolio: walk an island built from my projects, or boot the desktop OS inside it. Lead developer on Softventory; building BrandThis at Claxon AI.";
+  "Tharun Adhithya G S — software developer in Chennai. A playable portfolio: walk an island built from my projects, or boot the desktop OS inside it. Led Softventory; shipped BrandThis and PitchMyWeb at Claxon AI; now freelancing.";
 
 // Set NEXT_PUBLIC_SITE_URL in Vercel once the domain is live — it makes
 // Open Graph and canonical URLs absolute instead of relative.
