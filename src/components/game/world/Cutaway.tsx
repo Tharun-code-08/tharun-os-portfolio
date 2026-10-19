@@ -4,6 +4,7 @@ import { useMemo, useRef, type ReactNode } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Mesh, type Group, type Material } from "three";
 import { runtime } from "@/game/runtime";
+import { useGame } from "@/game/store";
 
 /** How far the roof overhangs its footprint, and how thick a slab to test. */
 const OVERHANG = 0.9;
@@ -89,8 +90,11 @@ export function Cutaway({
     const inside =
       Math.abs(p.x - bounds.x) < bounds.halfX && Math.abs(p.z - bounds.z) < bounds.halfZ && p.y < bounds.below;
     const c = state.camera.position;
+    // Only while you are actually playing: the title orbit and the intro
+    // fly over the roofs, and a roofless island looks broken from up there.
     const blocking =
       !inside &&
+      useGame.getState().mode === "play" &&
       segmentHitsBox(
         c.x, c.y, c.z,
         p.x, p.y + 1.1, p.z,

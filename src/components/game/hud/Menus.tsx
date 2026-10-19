@@ -82,8 +82,8 @@ function Pause({ onClose }: { onClose: () => void }) {
 
   return (
     <Shell title="Paused" kicker={profile.os.name} onClose={onClose}>
-      <div className="grid gap-6 sm:grid-cols-[1fr_12rem]">
-        <nav className="flex flex-col gap-1.5">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 sm:grid-cols-[minmax(0,1fr)_12rem]">
+        <nav className="flex min-w-0 flex-col gap-1.5">
           {items.map((it, i) => (
             <button
               key={it.label}
@@ -100,8 +100,14 @@ function Pause({ onClose }: { onClose: () => void }) {
                 i === index ? "translate-x-1 border-[#ffb020]/60 bg-[#ffb020]/12 text-white" : "border-white/8 bg-white/[0.03] text-white/75"
               }`}
             >
-              <span className={`font-display text-[14px] font-semibold ${it.tone === "accent" ? "text-[#ffb020]" : ""}`}>{it.label}</span>
-              <span className="font-mono text-[9px] tracking-[0.12em] text-white/45 uppercase">{it.hint}</span>
+              <span
+                className={`shrink-0 font-display text-[14px] font-semibold whitespace-nowrap ${it.tone === "accent" ? "text-[#ffb020]" : ""}`}
+              >
+                {it.label}
+              </span>
+              <span className="ml-3 min-w-0 truncate text-right font-mono text-[9px] tracking-[0.12em] text-white/45 uppercase">
+                {it.hint}
+              </span>
             </button>
           ))}
         </nav>

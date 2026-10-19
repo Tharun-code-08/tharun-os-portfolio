@@ -8,6 +8,7 @@ import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
 import { useGame, effectiveQuality } from "@/game/store";
 import { QUALITY } from "@/game/quality";
 import { emit, runtime } from "@/game/runtime";
+import { INTERACTABLES } from "@/game/zones";
 import { CameraRig } from "./CameraRig";
 import { Player } from "./Player";
 import { Environment } from "./world/Environment";
@@ -30,7 +31,16 @@ function DevHandle() {
   const camera = useThree((s) => s.camera);
   useEffect(() => {
     if (process.env.NODE_ENV === "production") return;
-    (window as unknown as { __r3f: unknown }).__r3f = { advance, gl, scene, camera, runtime, game: useGame, emit };
+    (window as unknown as { __r3f: unknown }).__r3f = {
+      advance,
+      gl,
+      scene,
+      camera,
+      runtime,
+      game: useGame,
+      emit,
+      interactables: INTERACTABLES,
+    };
   }, [advance, gl, scene, camera]);
   return null;
 }

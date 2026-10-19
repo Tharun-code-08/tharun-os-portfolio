@@ -42,7 +42,7 @@ export function Tag({ children }: { children: ReactNode }) {
 export function StatusDot({ state }: { state: "shipped" | "building" | "archived" }) {
   const map = {
     building: { color: "bg-accent", label: "Building", pulse: true },
-    shipped: { color: "bg-ok", label: "Live", pulse: false },
+    shipped: { color: "bg-ok", label: "Shipped", pulse: false },
     archived: { color: "bg-faint", label: "Archived", pulse: false },
   } as const;
   const s = map[state];

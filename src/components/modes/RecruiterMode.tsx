@@ -10,7 +10,14 @@ import { Icon } from "../os/Icon";
  * this is for someone with six minutes and forty other candidates.
  * Plain, scrollable, keyboard-closable, and it prints to a clean sheet.
  */
-export function RecruiterMode({ onClose }: { onClose: () => void }) {
+export function RecruiterMode({
+  onClose,
+  backLabel = "BACK TO THE OS",
+}: {
+  onClose: () => void;
+  /** Where closing takes you — the OS, or the island. */
+  backLabel?: string;
+}) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -26,21 +33,23 @@ export function RecruiterMode({ onClose }: { onClose: () => void }) {
   return (
     <div className="print-sheet scrollbar-thin fixed inset-0 z-[160] overflow-y-auto bg-bg">
       <div className="no-print sticky top-0 z-10 flex items-center justify-between border-b border-line bg-bg/90 px-5 py-3 backdrop-blur sm:px-8">
-        <p className="font-mono text-[10px] tracking-[0.24em] text-accent">RECRUITER MODE</p>
+        <p className="font-mono text-[10px] tracking-[0.24em] whitespace-nowrap text-accent">RECRUITER MODE</p>
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => window.print()}
-            className="rounded border border-line px-2.5 py-1 font-mono text-[10px] tracking-[0.14em] text-faint transition-colors hover:border-muted hover:text-ink"
+            className="rounded border border-line px-2.5 py-1 font-mono text-[10px] tracking-[0.14em] whitespace-nowrap text-faint transition-colors hover:border-muted hover:text-ink"
           >
-            PRINT / PDF
+            PRINT<span className="hidden sm:inline"> / PDF</span>
           </button>
           <button
             type="button"
             onClick={onClose}
-            className="flex items-center gap-1.5 rounded border border-line px-2.5 py-1 font-mono text-[10px] tracking-[0.14em] text-faint transition-colors hover:border-accent hover:text-accent"
+            aria-label={backLabel.toLowerCase()}
+            className="flex items-center gap-1.5 rounded border border-line px-2.5 py-1 font-mono text-[10px] tracking-[0.14em] whitespace-nowrap text-faint transition-colors hover:border-accent hover:text-accent"
           >
-            BACK TO THE OS
+            <span className="sm:hidden">BACK</span>
+            <span className="hidden sm:inline">{backLabel}</span>
             <Icon name="close" className="h-3 w-3" />
           </button>
         </div>

@@ -14,7 +14,10 @@ export function MeApp() {
       <AppHeading eyebrow="ME.EXE" title={profile.name} lede={profile.intro} />
 
       <dl className="mb-8">
-        <Row k="Role" v={`${current.role} at ${current.company}`} />
+        <Row
+          k="Role"
+          v={current.company === "Freelance" ? `Freelance ${current.role}` : `${current.role} at ${current.company}`}
+        />
         <Row k="Studying" v={`${profile.education}, ${education[0].school}`} />
         <Row k="Based in" v={profile.location} />
         <Row k="Reachable" v={<OutLink href={`mailto:${contact.email}`}>{contact.email}</OutLink>} />

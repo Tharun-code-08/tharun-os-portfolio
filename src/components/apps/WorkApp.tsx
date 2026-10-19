@@ -13,7 +13,7 @@ export function WorkApp() {
       <AppHeading
         eyebrow="WORK"
         title="Things that exist"
-        lede="Every item here links to a live URL or to source. The first one is the one that matters — it is in production and people run their stock on it."
+        lede="Every item here links to a live URL or to source, newest first. The top three are full products; the rest are builds and experiments."
       />
 
       <ul className="space-y-px overflow-hidden rounded-lg border border-line bg-line">

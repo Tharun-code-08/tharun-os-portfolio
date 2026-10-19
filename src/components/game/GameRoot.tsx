@@ -225,6 +225,7 @@ function Game() {
 
       {recruiter ? (
         <RecruiterMode
+          backLabel={mode === "os" ? "BACK TO THE OS" : "BACK TO THE ISLAND"}
           onClose={() => {
             sfx("close");
             useGame.getState().setRecruiter(false);

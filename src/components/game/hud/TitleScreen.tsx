@@ -182,13 +182,17 @@ export function TitleScreen() {
                         : "border-white/8 bg-white/[0.03] text-white/70 hover:text-white"
                     }`}
                   >
-                    <span className="flex items-center gap-3">
+                    <span className="flex shrink-0 items-center gap-3">
                       <span className={`font-mono text-[10px] text-[#ffb020] transition-opacity ${on ? "opacity-100" : "opacity-0"}`}>
                         ▶
                       </span>
-                      <span className="font-display text-[15px] font-semibold tracking-[-0.01em]">{item.label}</span>
+                      <span className="font-display text-[15px] font-semibold tracking-[-0.01em] whitespace-nowrap">
+                        {item.label}
+                      </span>
                     </span>
-                    <span className="font-mono text-[9.5px] tracking-[0.12em] text-white/45 uppercase">{item.hint}</span>
+                    <span className="ml-3 min-w-0 truncate text-right font-mono text-[9.5px] tracking-[0.12em] text-white/45 uppercase">
+                      {item.hint}
+                    </span>
                   </button>
                 );
               })}
