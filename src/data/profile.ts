@@ -18,17 +18,17 @@ export const profile = {
 
   /** Shown under the headline. Keep it to two or three sentences. */
   intro:
-    "I'm a second-year CS undergrad already working in industry. I led development on Softventory, an enterprise inventory SaaS running in production, and I'm now building BrandThis at Claxon AI. My first job was two months of XR work before the degree even started, and somewhere in between I wrote my own browser IDE.",
+    "I'm a second-year CS undergrad already working in industry. I led development on Softventory, an enterprise inventory SaaS running in production, then shipped BrandThis and PitchMyWeb at Claxon AI. Now I freelance, and right now I'm building a quick-commerce app for a client. My first job was two months of XR work before the degree even started, and somewhere in between I wrote my own browser IDE.",
 
   /** The status line in the menu bar and hero. Update it when the work changes. */
   status: {
     state: "BUILDING" as const,
-    what: "BrandThis at Claxon AI",
+    what: "A quick-commerce app for a client",
   },
 
   /** The summary paragraph at the top of Recruiter Mode. Keep it to one block. */
   resumeSummary:
-    "Second-year Computer Science undergraduate already working in industry, starting with an AR/VR internship the summer before the degree began. Led development of Softventory, an enterprise inventory management SaaS running in production, and now builds BrandThis at Claxon AI. Hands-on across the full stack — TypeScript, React/Next.js, NestJS and PostgreSQL — with experience designing multi-tenant architecture and owning real deployments, plus a browser-based polyglot IDE built from scratch.",
+    "Second-year Computer Science undergraduate already working in industry, starting with an AR/VR internship the summer before the degree began. Led development of Softventory, an enterprise inventory management SaaS running in production, then shipped two products at Claxon AI: BrandThis, a brand-intelligence SaaS, and PitchMyWeb, which finds local businesses without a website and pitches them a ready-made one over WhatsApp. Now freelancing, currently building a quick-commerce app for a client. Hands-on across the full stack — TypeScript, React/Next.js, NestJS and PostgreSQL — with experience designing multi-tenant architecture and owning real deployments, plus a browser-based polyglot IDE built from scratch.",
 
   os: {
     name: "THARUN OS",
@@ -46,8 +46,8 @@ export const contact = {
   githubHandle: "Tharun-code-08",
   linkedin: "https://www.linkedin.com/in/tharuncode",
   linkedinHandle: "in/tharuncode",
-  /** Drop a PDF at public/resume.pdf and change this to "/resume.pdf". */
-  resume: "/Tharun_Adhithya_Resume.docx",
+  /** The one-page résumé. The .docx next to it is the editable source. */
+  resume: "/Tharun_Adhithya_Resume.pdf",
   /** TODO (Tharun): add your LeetCode handle and this appears in PROOF and ⌘K. */
   leetcode: null as string | null,
 };
@@ -93,14 +93,14 @@ export const stack: StackGroup[] = [
     items: [
       { name: "PostgreSQL", note: "Row-level security, append-only ledgers, backup tiers." },
       { name: "Prisma", note: "Schema, migrations, and the type safety that comes with it." },
-      { name: "Redis", note: "Caching and queue-backed background work." },
+      { name: "Redis", note: "Caching, locks and BullMQ queues — PitchMyWeb's WhatsApp sending runs on them." },
       { name: "MongoDB", note: "Used on earlier projects before Postgres became the default." },
     ],
   },
   {
     label: "AI",
     items: [
-      { name: "LLM APIs", note: "BrandThis runs on them — the work is in the context you give a model, not the call." },
+      { name: "LLM APIs", note: "BrandThis ran on them — the work is in the context you give a model, not the call." },
       {
         name: "Agent workflows",
         note: "Claxon builds agents that finish a task rather than recommend one. Different discipline to prompting.",
@@ -123,6 +123,8 @@ export const stack: StackGroup[] = [
     label: "Infrastructure",
     items: [
       { name: "Docker", note: "Backend ran containerised on a self-hosted VPS." },
+      { name: "AWS + Terraform", note: "PitchMyWeb's server, defined as code and deployed from a script." },
+      { name: "Cloudflare", note: "Proxy, DNS as code, Turnstile on sign-up, and Access in front of the admin." },
       { name: "GitHub Actions", note: "CI pipelines I owned — build, check, deploy." },
       { name: "Vercel", note: "Frontend deployments and preview environments." },
       { name: "Linux (VPS)", note: "Self-hosted Postgres, backups, recovery drills." },
@@ -134,9 +136,10 @@ export const stack: StackGroup[] = [
 
 export const now = {
   /** Update this date whenever you rewrite the section below. */
-  updated: "September 2026",
+  updated: "October 2026",
   building: [
-    "BrandThis at Claxon AI — turning a company's website into a Brand DNA that generative tools can actually work from, so output comes back on-brand rather than merely on-topic.",
+    "A quick-commerce app for a client — my first freelance build, from the scope and the quote to the handover.",
+    "Freelance work for clients: sites and apps, scoped honestly and handed over in a state someone else can run.",
   ],
   learning: [
     "Data structures and algorithms, properly rather than for a test — working through LeetCode most days.",

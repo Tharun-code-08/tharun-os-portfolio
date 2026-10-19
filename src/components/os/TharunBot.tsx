@@ -7,13 +7,20 @@ import type { LifeState } from "@/lib/life";
 
 type R = [number, number, number, number, string];
 
-const SKIN = "#c98c5e";
-const SKIN_DK = "#a87049";
-const HAIR = "#221812";
-const SHIRT = "#b83b34";
-const SHIRT_DK = "#8f2b25";
-const PANTS = "#39405a";
-const PANTS_DK = "#2b3147";
+// Same look as the 3D model on the island (art/build_tharun.py): a quiff
+// swept up with a fringe on his right, a short beard fullest on the chin, a
+// thin moustache, black tee with the amber T, jeans.
+const SKIN = "#c68660";
+const SKIN_DK = "#a56b4b";
+const HAIR = "#1c1416";
+const BEARD = "#7a5139";
+const CHIN = "#5a3e31";
+const MOUSTACHE = "#4a3229";
+const SHIRT = "#2a2a31";
+const SHIRT_DK = "#1b1b20";
+const LOGO = "#ffb020";
+const PANTS = "#3d5d8c";
+const PANTS_DK = "#2f4a72";
 const SHOE = "#ece7de";
 const EYE = "#15151b";
 
@@ -90,12 +97,27 @@ function mouthFor(emotion: Emotion): R[] {
 
 function body(pose: Pose, frame: "a" | "b"): R[] {
   const base: R[] = [
-    // head + hair
+    // head + hair: short sides, a quiff swept up and to his left, and a
+    // fringe falling over the forehead on his right
     [6, 0, 12, 11, SKIN],
-    [5, -2, 14, 5, HAIR],
-    [4, 1, 2, 6, HAIR],
-    [18, 1, 2, 6, HAIR],
-    [4, -1, 3, 2, HAIR],
+    [5, -1, 14, 3, HAIR],
+    [5, -3, 13, 2, HAIR],
+    [7, -5, 11, 2, HAIR],
+    [10, -6, 7, 1, HAIR],
+    [6, 2, 4, 1, HAIR],
+    [7, 3, 2, 1, HAIR],
+    [5, 2, 1, 3, HAIR],
+    [18, 2, 1, 3, HAIR],
+    // stubble along the jaw, fuller on the chin, and a thin moustache (the
+    // mouth draws over it)
+    [6, 6, 1, 4, BEARD],
+    [17, 6, 1, 4, BEARD],
+    [7, 9, 2, 1, BEARD],
+    [15, 9, 2, 1, BEARD],
+    [7, 10, 2, 1, BEARD],
+    [15, 10, 2, 1, BEARD],
+    [9, 10, 6, 1, CHIN],
+    [10, 8, 4, 1, MOUSTACHE],
     // neck
     [10, 11, 4, 3, SKIN_DK],
     // torso
@@ -103,8 +125,8 @@ function body(pose: Pose, frame: "a" | "b"): R[] {
     [4, 14, 3, 20, SHIRT_DK],
     [17, 14, 3, 20, SHIRT_DK],
     // the T on the shirt
-    [9, 19, 6, 2, "#f3e6c8"],
-    [11, 21, 2, 5, "#f3e6c8"],
+    [9, 19, 6, 2, LOGO],
+    [11, 21, 2, 5, LOGO],
     // legs
     [5, 34, 6, 22, PANTS],
     [13, 34, 6, 22, PANTS],
@@ -283,7 +305,7 @@ export function TharunBot({ life }: { life: LifeState }) {
         className="pointer-events-auto h-full transition-transform duration-200 hover:-translate-y-1"
       >
         <svg
-          viewBox="0 0 34 64"
+          viewBox="0 -6 34 70"
           shapeRendering="crispEdges"
           className="h-full w-auto drop-shadow-[0_8px_18px_rgba(0,0,0,0.55)]"
           style={{ transform: `scaleX(${mark.facing})` }}

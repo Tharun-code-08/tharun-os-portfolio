@@ -14,7 +14,15 @@ import { Icon } from "./Icon";
  * Sheets are driven by the same window store as the desktop, so an app that
  * opens another app (WORK opening a case file) gets a back stack for free.
  */
-export function MobileShell({ onRecruiterMode }: { onRecruiterMode: () => void }) {
+export function MobileShell({
+  onRecruiterMode,
+  onExit,
+  exitLabel = "ISLAND",
+}: {
+  onRecruiterMode: () => void;
+  onExit?: () => void;
+  exitLabel?: string;
+}) {
   const os = useOs();
   const top = os.wins.filter((w) => !w.minimized).sort((a, b) => b.z - a.z)[0];
 
@@ -28,7 +36,18 @@ export function MobileShell({ onRecruiterMode }: { onRecruiterMode: () => void }
   return (
     <div className="min-h-dvh bg-bg">
       <header className="flex h-[34px] items-center justify-between border-b border-line-soft px-4">
-        <span className="font-mono text-[10.5px] tracking-[0.22em] text-ink">{profile.os.name}</span>
+        <span className="flex items-center gap-3">
+          {onExit ? (
+            <button
+              type="button"
+              onClick={onExit}
+              className="font-mono text-[9.5px] tracking-[0.16em] text-accent"
+            >
+              ⏻ {exitLabel}
+            </button>
+          ) : null}
+          <span className="font-mono text-[10.5px] tracking-[0.22em] text-ink">{profile.os.name}</span>
+        </span>
         <button
           type="button"
           onClick={onRecruiterMode}

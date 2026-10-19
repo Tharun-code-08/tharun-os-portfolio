@@ -215,11 +215,11 @@ function reducer(state: State, action: Action): State {
  * The workspace is restored the way you left it — move a window, refresh, and
  * it is still there. Read lazily so the server render stays deterministic.
  */
-function initState(): State {
+function initState(storageKey: string | null): State {
   const empty: State = { wins: [], z: 10, cascade: 0, space: "personal" };
-  if (typeof window === "undefined") return empty;
+  if (typeof window === "undefined" || !storageKey) return empty;
   try {
-    const raw = localStorage.getItem(SESSION_KEY);
+    const raw = localStorage.getItem(storageKey);
     if (!raw) return empty;
     const saved = JSON.parse(raw) as State;
     if (!Array.isArray(saved.wins)) return empty;
@@ -256,8 +256,18 @@ function viewport(): Viewport {
   return { w: window.innerWidth, h: window.innerHeight };
 }
 
-export function OsProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, undefined, initState);
+/**
+ * `storageKey` remembers the workspace across reloads. The game's zone panels
+ * pass null — a panel left open should not greet you on the next visit.
+ */
+export function OsProvider({
+  children,
+  storageKey = SESSION_KEY,
+}: {
+  children: ReactNode;
+  storageKey?: string | null;
+}) {
+  const [state, dispatch] = useReducer(reducer, storageKey, initState);
 
   // The character notices the shape of the desktop, not just the clicks.
   const openIds = useRef(new Set<string>());
@@ -267,12 +277,13 @@ export function OsProvider({ children }: { children: ReactNode }) {
   }, [state.wins, state.space]);
 
   useEffect(() => {
+    if (!storageKey) return;
     try {
-      localStorage.setItem(SESSION_KEY, JSON.stringify(state));
+      localStorage.setItem(storageKey, JSON.stringify(state));
     } catch {
       /* storage disabled — the session simply is not remembered. */
     }
-  }, [state]);
+  }, [state, storageKey]);
 
   const open = useCallback((appId: AppId, payload?: string, title?: string) => {
     const id = (payload ? `${appId}:${payload}` : appId);

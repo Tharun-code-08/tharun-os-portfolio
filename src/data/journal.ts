@@ -27,9 +27,31 @@ export type LogEntry = {
  */
 export const buildLog: LogEntry[] = [
   {
-    date: "2026-09-12",
-    kind: "BUILD",
-    title: "Building BrandThis at Claxon AI",
+    date: "2026-10-17",
+    kind: "START",
+    title: "Went freelance",
+    detail:
+      "Taking on client work directly. First up: a quick-commerce app, scoped and quoted before a line of code.",
+  },
+  {
+    date: "2026-10-16",
+    kind: "SHIP",
+    title: "Shipped PitchMyWeb",
+    detail:
+      "Finds local businesses with no website, builds each one a real sample site, and pitches it from your own WhatsApp. Payments, email, Cloudflare in front, AWS behind.",
+    href: "https://pitchmyweb.in",
+  },
+  {
+    date: "2026-09-15",
+    kind: "START",
+    title: "Started PitchMyWeb at Claxon AI",
+    detail:
+      "A second product, straight after the first. Lead discovery, sample-site generation and WhatsApp outreach in one pipeline.",
+  },
+  {
+    date: "2026-09-14",
+    kind: "SHIP",
+    title: "Finished BrandThis",
     detail:
       "Brand intelligence for generative work — read a company's website, turn it into a Brand DNA, keep everything generated afterwards on-brand.",
     href: "https://brandthis.in",

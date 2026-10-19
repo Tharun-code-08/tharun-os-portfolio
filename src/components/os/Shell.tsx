@@ -42,15 +42,21 @@ function alreadyBooted() {
   }
 }
 
-export function Shell() {
+type ShellProps = {
+  /** When the OS is running inside the game, how to get back to the island. */
+  onExit?: () => void;
+  exitLabel?: string;
+};
+
+export function Shell(props: ShellProps) {
   return (
     <OsProvider>
-      <ShellInner />
+      <ShellInner {...props} />
     </OsProvider>
   );
 }
 
-function ShellInner() {
+function ShellInner({ onExit, exitLabel }: ShellProps) {
   const os = useOs();
 
   // The two shells are structurally different, so this is a real branch rather
@@ -118,6 +124,7 @@ function ShellInner() {
       if (e.key === "Escape") {
         if (palette || mission || menu) return; // those close themselves
         if (top) os.close(top.id);
+        else onExit?.(); // an empty desk and Esc: log off, back outside
         return;
       }
 
@@ -181,7 +188,7 @@ function ShellInner() {
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [os, palette, mission, menu]);
+  }, [os, palette, mission, menu, onExit]);
 
   if (!mounted) {
     return <div className="min-h-dvh bg-bg" aria-hidden />;
@@ -194,7 +201,7 @@ function ShellInner() {
   if (isMobile) {
     return (
       <>
-        <MobileShell onRecruiterMode={() => setRecruiter(true)} />
+        <MobileShell onRecruiterMode={() => setRecruiter(true)} onExit={onExit} exitLabel={exitLabel} />
         <Konami />
       </>
     );
@@ -219,6 +226,8 @@ function ShellInner() {
         onCommand={openPalette}
         onRecruiterMode={() => setRecruiter(true)}
         onMissionControl={openMission}
+        onExit={onExit}
+        exitLabel={exitLabel}
       />
 
       <Desktop life={life} onSkip={() => setSkipped(true)} />

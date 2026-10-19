@@ -8,10 +8,14 @@ export function MenuBar({
   onCommand,
   onRecruiterMode,
   onMissionControl,
+  onExit,
+  exitLabel = "BACK TO THE ISLAND",
 }: {
   onCommand: () => void;
   onRecruiterMode: () => void;
   onMissionControl: () => void;
+  onExit?: () => void;
+  exitLabel?: string;
 }) {
   const os = useOs();
   const [clock, setClock] = useState<string | null>(null);
@@ -33,10 +37,21 @@ export function MenuBar({
   return (
     <header className="absolute inset-x-0 top-0 z-[90] flex h-[34px] items-center justify-between border-b border-line-soft bg-bg/80 px-3 backdrop-blur-md sm:px-4">
       <div className="flex min-w-0 items-center gap-3 sm:gap-5">
-        <span className="font-mono text-[11px] tracking-[0.22em] text-ink">
+        {onExit ? (
+          <button
+            type="button"
+            onClick={onExit}
+            title="Log off (Esc on an empty desk)"
+            className="flex shrink-0 items-center gap-1.5 rounded border border-accent/40 bg-accent/10 px-2 py-0.5 font-mono text-[10px] tracking-[0.14em] whitespace-nowrap text-accent transition-colors hover:bg-accent hover:text-accent-ink"
+          >
+            <span aria-hidden>⏻</span>
+            <span className="hidden sm:inline">{exitLabel}</span>
+          </button>
+        ) : null}
+        <span className="font-mono text-[11px] tracking-[0.22em] whitespace-nowrap text-ink">
           {profile.os.name}
         </span>
-        <span className="hidden font-mono text-[10px] tracking-[0.14em] text-faint sm:inline">
+        <span className="hidden font-mono text-[10px] tracking-[0.14em] whitespace-nowrap text-faint xl:inline">
           v{profile.os.version} · {profile.os.edition}
         </span>
 

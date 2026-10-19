@@ -1,11 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Unbounded } from "next/font/google";
 import { profile, contact } from "@/data/profile";
 import { THEME_BOOTSTRAP } from "@/lib/theme";
 import "./globals.css";
 
 const inter = Inter({
   variable: "--font-inter",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const display = Unbounded({
+  variable: "--font-unbounded",
   subsets: ["latin"],
   display: "swap",
 });
@@ -17,7 +23,7 @@ const mono = JetBrains_Mono({
 });
 
 const description =
-  "Tharun Adhithya G S — software developer in Chennai. Lead developer on Softventory, an enterprise inventory SaaS in production. TypeScript, Next.js, NestJS, PostgreSQL.";
+  "Tharun Adhithya G S — software developer in Chennai. A playable portfolio: walk an island built from my projects, or boot the desktop OS inside it. Led Softventory; shipped BrandThis and PitchMyWeb at Claxon AI; now freelancing.";
 
 // Set NEXT_PUBLIC_SITE_URL in Vercel once the domain is live — it makes
 // Open Graph and canonical URLs absolute instead of relative.
@@ -58,7 +64,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#070707",
+  themeColor: "#0b0b14",
   colorScheme: "dark light",
 };
 
@@ -72,7 +78,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
       </head>
-      <body className={`${inter.variable} ${mono.variable} antialiased`}>{children}</body>
+      <body className={`${inter.variable} ${mono.variable} ${display.variable} antialiased`}>{children}</body>
     </html>
   );
 }

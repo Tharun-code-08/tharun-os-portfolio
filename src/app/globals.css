@@ -16,10 +16,20 @@
   --color-warn: #ffb020;
   --color-dim: #6f6f6f;
 
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-mono-stack), ui-monospace, "SF Mono", Menlo, monospace;
 
   --radius-window: 10px;
+}
+
+/*
+ * The fonts come from next/font, which sets --font-inter etc. on <body>.
+ * `inline` makes the utilities carry var(--font-inter) themselves, so it is
+ * resolved on the element that uses it — declared at :root it would resolve
+ * before <body> defines it, and silently fall back to system fonts.
+ */
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-stack), ui-monospace, "SF Mono", Menlo, monospace;
+  --font-display: var(--font-unbounded), var(--font-inter), ui-sans-serif, sans-serif;
 }
 
 /* ---------------------------------------------------------------- base ---- */
@@ -93,7 +103,7 @@
   body {
     background: var(--color-bg);
     color: var(--color-ink);
-    font-family: var(--font-sans);
+    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     overscroll-behavior: none;
@@ -161,6 +171,277 @@
     transparent 3px
   );
   z-index: 60;
+}
+
+
+/* ---------------------------------------------------------------- game ---- */
+/* The island's HUD. Glass panels over a 3D world: dark, warm, amber accent. */
+
+.hud-glass {
+  background: linear-gradient(180deg, rgba(14, 16, 28, 0.78), rgba(8, 9, 18, 0.72));
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow:
+    0 18px 40px -18px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+}
+
+.keycap {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.6em;
+  height: 1.6em;
+  padding: 0 0.4em;
+  border-radius: 0.35em;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-bottom-width: 3px;
+  background: rgba(255, 255, 255, 0.06);
+  font-family: var(--font-mono-stack), ui-monospace, monospace;
+  font-size: 0.72em;
+  line-height: 1;
+  color: #fff7e8;
+}
+
+.title-logo {
+  background: linear-gradient(100deg, #fff3d6 0%, #ffd27a 30%, #ffb020 55%, #ff7a45 80%, #ff4fd8 110%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: logo-shine 7s ease-in-out infinite;
+  filter: drop-shadow(0 6px 28px rgba(255, 140, 60, 0.35));
+}
+
+@keyframes logo-shine {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes glitch-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-6px) skewX(-12deg);
+    clip-path: inset(0 0 60% 0);
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(4px) skewX(6deg);
+    clip-path: inset(40% 0 10% 0);
+  }
+  40% {
+    transform: translateX(-2px);
+    clip-path: inset(10% 0 50% 0);
+  }
+  60% {
+    transform: translateX(1px);
+    clip-path: inset(0 0 0 0);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 0 0 0);
+  }
+}
+.animate-glitch-in {
+  animation: glitch-in 900ms steps(12, end) both;
+}
+
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(-40%) scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+}
+.animate-bubble-in {
+  animation: bubble-in 260ms cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-toast-in {
+  animation: toast-in 360ms cubic-bezier(0.2, 1.3, 0.4, 1) both;
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(40px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-panel-in {
+  animation: panel-in 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes banner {
+  0% {
+    opacity: 0;
+    letter-spacing: 0.5em;
+  }
+  15%,
+  80% {
+    opacity: 1;
+    letter-spacing: 0.18em;
+  }
+  100% {
+    opacity: 0;
+    letter-spacing: 0.22em;
+  }
+}
+.animate-banner {
+  animation: banner 3400ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes rule-grow {
+  0% {
+    transform: scaleX(0);
+  }
+  20%,
+  80% {
+    transform: scaleX(1);
+  }
+  100% {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+}
+.animate-rule-grow {
+  animation: rule-grow 3400ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes crt-on {
+  0% {
+    transform: scale(1, 0.004);
+    filter: brightness(6);
+  }
+  35% {
+    transform: scale(1, 0.004);
+    filter: brightness(6);
+  }
+  60% {
+    transform: scale(1, 1.02);
+    filter: brightness(2);
+  }
+  100% {
+    transform: none;
+    filter: none;
+  }
+}
+.animate-crt-on {
+  animation: crt-on 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes crt-off {
+  0% {
+    transform: none;
+    opacity: 1;
+  }
+  45% {
+    transform: scale(1, 0.006);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0, 0.006);
+    opacity: 0;
+  }
+}
+.animate-crt-off {
+  animation: crt-off 420ms cubic-bezier(0.6, 0, 0.8, 0.4) both;
+}
+
+@keyframes flash {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.animate-flash {
+  animation: flash 650ms ease-out both;
+}
+
+@keyframes dip {
+  0% {
+    opacity: 0;
+  }
+  35%,
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.animate-dip {
+  animation: dip 720ms ease-in-out both;
+}
+
+@keyframes prompt-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+.animate-prompt-in {
+  animation: prompt-in 220ms cubic-bezier(0.2, 1.3, 0.4, 1) both;
+}
+
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+.animate-float-y {
+  animation: float-y 2.4s ease-in-out infinite;
+}
+
+.game-range {
+  appearance: none;
+  height: 4px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.15);
+  accent-color: #ffb020;
+}
+.game-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 99px;
+  background: #ffb020;
+  box-shadow: 0 0 0 4px rgba(255, 176, 32, 0.2);
 }
 
 /* ------------------------------------------------------------ motion ------ */
