@@ -167,23 +167,26 @@ export function Studio() {
       <mesh position={[W / 2, f + 1.85, 0]} rotation-y={Math.PI / 2} material={mats.window}>
         <planeGeometry args={[D - 0.2, H - 1.6]} />
       </mesh>
-      {/* corner posts + front beam */}
+      {/* corner posts */}
       {[-W / 2, W / 2].map((x) => (
         <Box key={x} size={[0.32, H + 0.1, 0.32]} position={[x, f + H / 2, D / 2]} color={PAL.woodDark} />
       ))}
-      <Box size={[W + 0.3, 0.3, 0.3]} position={[0, f + H - 0.1, D / 2]} color={PAL.woodDark} />
 
-      {/* Roof — fades away while you are inside */}
+      {/* Roof and front beam — fade away while you are inside, since from the
+          porch side they sit right between the camera and the desk */}
       <Cutaway x={cx} z={cz + 0.2} halfX={W / 2} halfZ={D / 2 + 0.6} below={f + H - 0.4}>
         <Box size={[W + 1.4, 0.26, D + 1.8]} position={[0, f + H + 0.25, 0.2]} rotation={[0.07, 0, 0]} color={PAL.roof} />
         <Box size={[W + 1.5, 0.12, 0.3]} position={[0, f + H - 0.05, D / 2 + 1.1]} rotation={[0.07, 0, 0]} color={PAL.roofDark} />
+        <Box size={[W + 0.3, 0.3, 0.3]} position={[0, f + H - 0.1, D / 2]} color={PAL.woodDark} />
       </Cutaway>
 
-      {/* Sign */}
-      <Box size={[2.6, 0.6, 0.08]} position={[0, f + H + 0.75, D / 2 + 0.95]} color={PAL.woodDark} />
-      <Label position={[0, f + H + 0.76, D / 2 + 1.0]} size={0.26} color="#ffd27a">
-        STUDIO
-      </Label>
+      {/* Sign — goes completely (its label can't be a ghost) */}
+      <Cutaway x={cx} z={cz + 0.2} halfX={W / 2} halfZ={D / 2 + 0.6} below={f + H - 0.4} ghost={0}>
+        <Box size={[2.6, 0.6, 0.08]} position={[0, f + H + 0.75, D / 2 + 0.95]} color={PAL.woodDark} />
+        <Label position={[0, f + H + 0.76, D / 2 + 1.0]} size={0.26} color="#ffd27a">
+          STUDIO
+        </Label>
+      </Cutaway>
 
       {/* Rug */}
       <mesh rotation-x={-Math.PI / 2} position={[0.4, f + 0.012, -0.4]} material={toon("#7a3b5a")} receiveShadow>

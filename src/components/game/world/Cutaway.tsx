@@ -16,6 +16,7 @@ export function Cutaway({
   halfX,
   halfZ,
   below,
+  ghost = 0.1,
   children,
 }: {
   x: number;
@@ -24,6 +25,8 @@ export function Cutaway({
   halfZ: number;
   /** Only fade while the player's feet are under this height. */
   below: number;
+  /** Opacity while faded; 0 hides the group entirely. */
+  ghost?: number;
   children: ReactNode;
 }) {
   const group = useRef<Group>(null);
@@ -50,7 +53,7 @@ export function Cutaway({
     const p = runtime.player.position;
     const inside =
       Math.abs(p.x - bounds.x) < bounds.halfX && Math.abs(p.z - bounds.z) < bounds.halfZ && p.y < bounds.below;
-    fade.current += ((inside ? 0.1 : 1) - fade.current) * (1 - Math.exp(-8 * dt));
+    fade.current += ((inside ? ghost : 1) - fade.current) * (1 - Math.exp(-8 * dt));
     for (const m of mats.current) {
       m.opacity = fade.current;
       m.depthWrite = fade.current > 0.95;

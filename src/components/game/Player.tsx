@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import {
   CapsuleCollider,
   RigidBody,
+  useBeforePhysicsStep,
   useRapier,
   type RapierCollider,
   type RapierRigidBody,
@@ -29,6 +30,7 @@ const COYOTE = 0.12;
 const JUMP_BUFFER = 0.14;
 const STRIDE_WALK = 0.75;
 const KILL_Y = -14;
+const GROUND_PRESS = 0.4;
 
 function dampAngle(from: number, to: number, lambda: number, dt: number) {
   let d = ((to - from + Math.PI) % (Math.PI * 2)) - Math.PI;
@@ -47,9 +49,14 @@ function surfaceAt(x: number, z: number): "grass" | "wood" | "stone" {
  *
  * Velocity, gravity, coyote time, the jump buffer and respawning are all ours;
  * Rapier's controller only resolves "how far can I actually go" against the
- * world. The visible character is NOT parented to the rigid body — it is placed
- * at exactly the position we hand Rapier, so the camera and the model can never
- * disagree by a physics step.
+ * world.
+ *
+ * The simulation runs once per fixed physics step (useBeforePhysicsStep), not
+ * once per rendered frame: the body's position only advances when the world
+ * steps, so moving it every frame on a 144 Hz screen would overwrite the same
+ * step two or three times and he would walk at a fraction of his speed. The
+ * visible character is NOT parented to the rigid body — every frame it is
+ * placed between the last two steps, and the camera follows that same point.
  */
 export function Player() {
   const body = useRef<RapierRigidBody>(null);
@@ -85,6 +92,13 @@ export function Player() {
   });
 
   const start = runtime.player.position;
+  const clock = useThree((st) => st.clock);
+
+  // An empty object inside the body. Rapier moves the body's group to the
+  // position interpolated between the last two steps every frame (and
+  // <Physics> runs before any other frame callback), so its parent is where
+  // he should be drawn right now.
+  const anchor = useRef<Group>(null);
 
   // Teleports (map fast-travel) and forced respawns come in as events.
   useEffect(() => {
@@ -95,6 +109,8 @@ export function Player() {
       b.setTranslation(p, true);
       b.setNextKinematicTranslation(p);
       runtime.player.position.set(x, y, z);
+      // Jump the drawn body too, so nothing is interpolated across the map.
+      anchor.current?.parent?.position.set(p.x, p.y, p.z);
       s.current.vx = s.current.vy = s.current.vz = 0;
       runtime.input.moveTarget = null;
     };
@@ -125,12 +141,13 @@ export function Player() {
 
   const tmp = useMemo(() => new Vector3(), []);
 
-  useFrame((state, rawDt) => {
+  useBeforePhysicsStep((w) => {
     const b = body.current;
     const c = collider.current;
     const mv = mover.current;
     if (!b || !c || !mv) return;
-    const dt = Math.min(rawDt, 1 / 30);
+    const dt = w.timestep;
+    const now = clock.elapsedTime;
     const st = s.current;
     const game = useGame.getState();
     const control = canControl(game);
@@ -198,7 +215,10 @@ export function Player() {
       emit({ type: "jump" });
     }
 
-    if (st.grounded && st.vy <= 0) st.vy = -2.5;
+    // A light press into the ground is enough to stay grounded; snap-to-ground
+    // does the real work going downhill. A strong one gets projected onto the
+    // slope by the controller and drags him back down every hill he climbs.
+    if (st.grounded && st.vy <= 0) st.vy = -GROUND_PRESS;
     else st.vy = Math.max(st.vy - GRAVITY * dt, -TERMINAL);
 
     // --- resolve against the world ---------------------------------------
@@ -213,7 +233,7 @@ export function Player() {
     if (!st.grounded) st.airMinVy = Math.min(st.airMinVy, st.vy);
     if (st.grounded && !wasGrounded) {
       const impact = MathUtils.clamp(-st.airMinVy / 22, 0, 1);
-      runtime.player.landedAt = state.clock.elapsedTime;
+      runtime.player.landedAt = now;
       runtime.player.landImpact = impact;
       if (impact > 0.25) emit({ type: "land", impact });
       st.airMinVy = 0;
@@ -228,13 +248,12 @@ export function Player() {
     if (target && moved < 0.4) st.stuck += dt;
 
     const p = runtime.player;
-    p.position.set(next.x, next.y - FOOT_OFFSET, next.z);
     p.velocity.set(st.vx, st.vy, st.vz);
     p.grounded = st.grounded;
     p.speed = st.speed;
     if (wl > 0.15) p.facing = dampAngle(p.facing, Math.atan2(wx, wz), 12, dt);
 
-    const sinceLand = state.clock.elapsedTime - p.landedAt;
+    const sinceLand = now - p.landedAt;
     p.anim = !st.grounded
       ? st.vy > 0.5
         ? "jump"
@@ -277,6 +296,13 @@ export function Player() {
       botSay("fall");
       emit({ type: "respawn" });
     }
+  });
+
+  useFrame((state) => {
+    // Place him where Rapier has drawn the body this frame.
+    const p = runtime.player;
+    const drawn = anchor.current?.parent;
+    if (drawn) p.position.set(drawn.position.x, drawn.position.y - FOOT_OFFSET, drawn.position.z);
 
     if (visual.current) {
       visual.current.position.copy(p.position);
@@ -298,6 +324,7 @@ export function Player() {
         name="player"
         userData={{ player: true }}
       >
+        <group ref={anchor} />
         <CapsuleCollider
           ref={collider}
           args={[CAPSULE.halfHeight, CAPSULE.radius]}

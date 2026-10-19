@@ -7,6 +7,7 @@ import { PerformanceMonitor } from "@react-three/drei";
 import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
 import { useGame, effectiveQuality } from "@/game/store";
 import { QUALITY } from "@/game/quality";
+import { emit, runtime } from "@/game/runtime";
 import { CameraRig } from "./CameraRig";
 import { Player } from "./Player";
 import { Environment } from "./world/Environment";
@@ -18,13 +19,16 @@ import { Effects } from "./world/Effects";
 import { Sensors } from "./world/Sensors";
 import { Life } from "./world/Life";
 
-/** Dev only: lets the console step frames and read renderer stats. */
+/**
+ * Dev only: lets the console step frames, read renderer stats, and inspect or
+ * drive the player (position, mode, teleports) when testing the controller.
+ */
 function DevHandle() {
   const advance = useThree((s) => s.advance);
   const gl = useThree((s) => s.gl);
   useEffect(() => {
     if (process.env.NODE_ENV === "production") return;
-    (window as unknown as { __r3f: unknown }).__r3f = { advance, gl };
+    (window as unknown as { __r3f: unknown }).__r3f = { advance, gl, runtime, game: useGame, emit };
   }, [advance, gl]);
   return null;
 }
@@ -70,7 +74,9 @@ export function World() {
       <Suspense fallback={null}>
         <Environment />
         <Sea />
-        <Physics timeStep={1 / 60} interpolate>
+        {/* Steps before every other frame callback, so the player, camera
+            and HUD all read this frame's simulation, not the last one. */}
+        <Physics timeStep={1 / 60} interpolate updatePriority={-1}>
           <Island />
           <Places />
           <Sensors />
