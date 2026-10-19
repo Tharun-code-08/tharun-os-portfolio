@@ -22,20 +22,27 @@ from mathutils import Vector
 
 # ----------------------------------------------------------------- look -----
 
+# Tharun, as described by Tharun: textured hair with volume on top, medium
+# brown skin, glasses, stubble and a moustache, black tee and jeans.
 LOOK = {
     "skin": "#c98c5e",
     "skin_shadow": "#a87049",
-    "hair": "#221812",
-    "hair_style": "fringe",  # "fringe" | "short" | "spiky"
+    "hair": "#1c1410",
+    "hair_style": "textured",  # "textured" | "fringe" | "spiky"
     "eyes": "#15151b",
-    "shirt": "#b83b34",
-    "shirt_logo": "#f3e6c8",
-    "pants": "#39405a",
+    "shirt": "#26262d",
+    "shirt_logo": "#ffb020",
+    "pants": "#3d5d8c",
     "shoes": "#ece7de",
     "soles": "#3a3a40",
-    "glasses": False,
-    "glasses_frame": "#1b1b22",
-    "beard": False,
+    "glasses": True,
+    "glasses_frame": "#141418",
+    "beard": "stubble",  # False | "stubble" | "full"
+    # Stubble is a darker shade of the skin, not a hair colour; a full beard
+    # would use something close to "hair".
+    "beard_color": "#7a5139",
+    "moustache": True,
+    "moustache_color": "#2e211b",
 }
 
 # --------------------------------------------------------------- setup ------
@@ -164,6 +171,97 @@ def ellipsoid(name, center, radii, material, u=20, v=14, smooth=True):
     for vert in bm.verts:
         vert.co = Vector((vert.co.x * radii[0], vert.co.y * radii[1], vert.co.z * radii[2])) + Vector(center)
     return new_object(name, bm, material, smooth)
+
+
+def sweep(name, points, radius, material, closed=False, segs=8, plane_normal=(0.0, 1.0, 0.0), radii=None):
+    """A round tube along a polyline (frames, temples, moustache)."""
+    pts = [Vector(p) for p in points]
+    n = len(pts)
+    bm = bmesh.new()
+    rings = []
+    pn = Vector(plane_normal)
+    for i, p in enumerate(pts):
+        a = pts[(i - 1) % n] if (closed or i > 0) else p
+        b = pts[(i + 1) % n] if (closed or i < n - 1) else p
+        t = (b - a).normalized()
+        side = t.cross(pn)
+        if side.length < 1e-6:
+            side = t.cross(Vector((0, 0, 1)))
+        side.normalize()
+        up = side.cross(t).normalized()
+        r = radii[i] if radii else radius
+        rings.append([bm.verts.new(p + (side * math.cos(k / segs * math.tau) + up * math.sin(k / segs * math.tau)) * r) for k in range(segs)])
+    last = n if closed else n - 1
+    for i in range(last):
+        r0, r1 = rings[i], rings[(i + 1) % n]
+        for k in range(segs):
+            bm.faces.new((r0[k], r0[(k + 1) % segs], r1[(k + 1) % segs], r1[k]))
+    if not closed:
+        for ring, rev in ((rings[0], True), (rings[-1], False)):
+            c = bm.verts.new(sum((v.co for v in ring), Vector()) / segs)
+            for k in range(segs):
+                v1, v2 = ring[k], ring[(k + 1) % segs]
+                bm.faces.new((c, v2, v1) if rev else (c, v1, v2))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    return new_object(name, bm, material, True)
+
+
+def rounded_rect(center, w, h, r, steps=5):
+    """Points of a rounded rectangle in the XZ plane (a glasses rim)."""
+    c = Vector(center)
+    pts = []
+    corners = [(w / 2 - r, h / 2 - r, 0), (-(w / 2 - r), h / 2 - r, 90), (-(w / 2 - r), -(h / 2 - r), 180), (w / 2 - r, -(h / 2 - r), 270)]
+    for cx, cz, start in corners:
+        for k in range(steps + 1):
+            a = math.radians(start + 90 * k / steps)
+            pts.append(c + Vector((cx + math.cos(a) * r, 0.0, cz + math.sin(a) * r)))
+    return pts
+
+
+def keyed(points, x):
+    """Smoothstep between (x, y) keypoints — a soft curve through them."""
+    if x <= points[0][0]:
+        return points[0][1]
+    for (x0, y0), (x1, y1) in zip(points, points[1:]):
+        if x <= x1:
+            return y0 + (y1 - y0) * smoothstep(x0, x1, x)
+    return points[-1][1]
+
+
+def head_band(name, c, radii, grow, phi_max, top, bottom, material, nu=48, nv=12):
+    """
+    A patch of the head's own surface between two curves — top(phi) and
+    bottom(phi), phi measured around the head from the front. Its edges follow
+    those curves exactly, so beards and hairlines come out smooth instead of
+    stair-stepped along mesh faces.
+    """
+    rx, ry, rz = (r * grow for r in radii)
+    bm = bmesh.new()
+    grid = []
+    for i in range(nu + 1):
+        phi = -phi_max + 2 * phi_max * i / nu
+        zt, zb = top(phi), bottom(phi)
+        row = []
+        for j in range(nv + 1):
+            z = zt + (zb - zt) * j / nv
+            s = math.sqrt(max(0.0, 1 - (z / rz) ** 2))
+            row.append(bm.verts.new(c + Vector((rx * math.sin(phi) * s, -ry * math.cos(phi) * s, z))))
+        grid.append(row)
+    for i in range(nu):
+        for j in range(nv):
+            f = bm.faces.new((grid[i][j], grid[i + 1][j], grid[i + 1][j + 1], grid[i][j + 1]))
+            f.normal_update()
+            if f.normal.dot(f.calc_center_median() - c) < 0:
+                f.normal_flip()
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)
+    return new_object(name, bm, material, True)
+
+
+def on_face(x, z, push, c, radii):
+    """A point on the front of the head ellipsoid at (x, z), pushed outward."""
+    rx, ry, rz = radii
+    k = max(0.0, 1 - (x / rx) ** 2 - (z / rz) ** 2)
+    return Vector((x, -ry * math.sqrt(k) - push, z)) + c
 
 
 def smile(name, center, material, width=0.075, depth=0.022, thick=0.0075):
@@ -320,15 +418,25 @@ def build_head():
         # Brows.
         part(box(f"brow.{s}", c + Vector((0.095 * s, -ry * 0.93, 0.072)), (0.07, 0.018, 0.016), hair, bevel=0.005), ("head", None))
     # Mouth: a small dark line, slight smile.
-    part(smile("mouth", c + Vector((0, -ry * 0.955, -0.095)), mat("Mouth", "#6a3226")), ("head", None))
+    mouth_z = -0.118 if LOOK.get("moustache") else -0.095
+    part(smile("mouth", on_face(0.0, mouth_z, -0.004, c, (rx, ry, rz)), mat("Mouth", "#6a3226"), width=0.064, depth=0.018), ("head", None))
 
     # Hair cap: a slightly larger ellipsoid with the face cut out.
     bm = bmesh.new()
-    bmesh.ops.create_uvsphere(bm, u_segments=28, v_segments=18, radius=1.0)
+    bmesh.ops.create_uvsphere(bm, u_segments=48, v_segments=30, radius=1.0)
     for vert in bm.verts:
         vert.co = Vector((vert.co.x * rx * 1.07, vert.co.y * ry * 1.08, vert.co.z * rz * 1.06)) + c
-    face_cut = [v for v in bm.verts if (v.co.y - c.y) < -0.06 and (v.co.z - c.z) < 0.11]
+    textured = LOOK["hair_style"] == "textured"
+    # Textured: hairline sits higher and the sides are a tight fade.
+    hairline = 0.15 if textured else 0.11
+    face_cut = [v for v in bm.verts if (v.co.y - c.y) < -0.06 and (v.co.z - c.z) < hairline]
     low_cut = [v for v in bm.verts if (v.co.z - c.z) < (-0.12 if (v.co.y - c.y) > 0.05 else -0.02)]
+    if textured:
+        for v in bm.verts:
+            rel = v.co - c
+            # Pull the sides in toward the scalp so the volume reads on top.
+            if rel.z < 0.12:
+                v.co = c + Vector((rel.x * 0.975, rel.y * 0.985, rel.z))
     bmesh.ops.delete(bm, geom=list(set(face_cut + low_cut)), context="VERTS")
     cap = new_object("hair.cap", bm, hair, smooth=True)
     mod = cap.modifiers.new("thick", "SOLIDIFY")
@@ -337,6 +445,24 @@ def build_head():
 
     # Fringe / spikes, depending on the style.
     style = LOOK["hair_style"]
+    if style == "textured":
+        # Three rows of chunky clumps: a front quiff that lifts up and
+        # forward, a full middle, and a back row swept back.
+        rows = [
+            ([-0.14, -0.07, 0.0, 0.07, 0.14], -0.17, 0.185, (0.0, -0.05, 0.12), 0.06),
+            ([-0.18, -0.11, -0.04, 0.04, 0.11, 0.18], -0.08, 0.245, (0.0, -0.015, 0.13), 0.062),
+            ([-0.16, -0.08, 0.0, 0.08, 0.16], 0.02, 0.27, (0.0, 0.04, 0.12), 0.062),
+            ([-0.13, -0.045, 0.045, 0.13], 0.11, 0.24, (0.0, 0.08, 0.09), 0.058),
+            ([-0.08, 0.08], 0.18, 0.16, (0.0, 0.09, 0.05), 0.055),
+        ]
+        k = 0
+        for xs, y, z, tip, rad in rows:
+            for x in xs:
+                wob = ((k * 37) % 7 - 3) * 0.012
+                base = c + Vector((x, y, z - abs(x) * 0.35))
+                t = base + Vector((x * 0.35 + wob, tip[1] + wob * 0.5, tip[2] - abs(x) * 0.25))
+                part(lathe(f"clump.{k}", base, t, [(0.0, rad), (0.4, rad * 0.85), (0.78, rad * 0.58), (1.0, 0.03)], hair, segs=8, smooth=True), ("head", None))
+                k += 1
     if style in ("fringe", "spiky"):
         locks = [(-0.17, 0.2), (-0.09, 0.0), (0.0, -0.12), (0.09, 0.1), (0.17, -0.2)]
         for i, (x, tilt) in enumerate(locks):
@@ -350,25 +476,68 @@ def build_head():
             tip = base + Vector((math.cos(a) * 0.08, math.sin(a) * 0.08 + 0.05, 0.12))
             part(lathe(f"spike.{i}", base, tip, [(0.0, 0.07), (1.0, 0.01)], hair, segs=6, smooth=False), ("head", None))
     # A little volume on the crown so the silhouette reads as hair, not a helmet.
-    part(ellipsoid("hair.crown", c + Vector((0.0, 0.03, 0.2)), (0.2, 0.18, 0.11), hair, 14, 8), ("head", None))
-    for s in (1, -1):
-        part(ellipsoid(f"hair.side.{s}", c + Vector((0.24 * s, 0.03, 0.06)), (0.07, 0.15, 0.12), hair, 10, 8), ("head", None))
+    if style == "textured":
+        part(ellipsoid("hair.crown", c + Vector((0.0, -0.01, 0.215)), (0.225, 0.215, 0.12), hair, 16, 10), ("head", None))
+    else:
+        part(ellipsoid("hair.crown", c + Vector((0.0, 0.03, 0.2)), (0.2, 0.18, 0.11), hair, 14, 8), ("head", None))
+        for s in (1, -1):
+            part(ellipsoid(f"hair.side.{s}", c + Vector((0.24 * s, 0.03, 0.06)), (0.07, 0.15, 0.12), hair, 10, 8), ("head", None))
 
+    radii = (rx, ry, rz)
     if LOOK["glasses"]:
         frame = mat("Glasses", LOOK["glasses_frame"], 0.3)
+        fw, fh, fz = 0.122, 0.096, 0.004
+        fy = -ry - 0.012
         for s in (1, -1):
-            e = c + Vector((0.095 * s, -ry * 0.98, 0.0))
-            bm = bmesh.new()
-            bmesh.ops.create_circle(bm, cap_ends=False, segments=16, radius=0.055)
-            for v in bm.verts:
-                v.co = Vector((v.co.x, 0, v.co.y)) + e
-            ring = new_object(f"lens.{s}", bm, frame)
-            ring.modifiers.new("skin", "SKIN")
-            part(ring, ("head", None))
-        part(box("bridge", c + Vector((0, -ry * 0.99, 0.01)), (0.08, 0.01, 0.012), frame), ("head", None))
+            cx = 0.098 * s
+            rim = [p + Vector((0, 0, fz)) + c for p in rounded_rect((cx, fy, 0.0), fw, fh, 0.026)]
+            part(sweep(f"rim.{s}", rim, 0.0065, frame, closed=True), ("head", None))
+            # Temple arm: from the rim's outer edge back to the ear.
+            outer = c + Vector(((0.098 + fw / 2) * s, fy + 0.01, fz + 0.012))
+            hinge = c + Vector(((rx * 0.93) * s, -ry * 0.55, 0.02))
+            ear = c + Vector(((rx * 1.0) * s, 0.0, 0.0))
+            part(sweep(f"temple.{s}", [outer, hinge, ear], 0.0055, frame), ("head", None))
+        bridge_y = fy - 0.004
+        part(sweep("bridge", [c + Vector((-0.037, bridge_y, fz + 0.016)), c + Vector((0.0, bridge_y - 0.006, fz + 0.022)), c + Vector((0.037, bridge_y, fz + 0.016))], 0.0058, frame), ("head", None))
 
-    if LOOK["beard"]:
-        part(ellipsoid("beard", c + Vector((0, -ry * 0.55, -0.15)), (0.2, 0.16, 0.1), hair, 16, 10), ("head", None))
+    if LOOK.get("beard"):
+        beard = mat("Beard", LOOK.get("beard_color", LOOK["hair"]), 0.95)
+        full = LOOK["beard"] == "full"
+        deg = math.radians
+        # Top edge: under the lip at the chin, up past the mouth corners to
+        # meet the moustache, then a low line along the jaw (stubble doesn't
+        # climb the cheeks) up into short sideburns.
+        top_keys = (
+            [(0, -0.152), (deg(11), -0.15), (deg(20), -0.092), (deg(40), -0.07), (deg(70), -0.03), (deg(98), 0.05)]
+            if full
+            else [(0, -0.152), (deg(11), -0.15), (deg(20), -0.095), (deg(42), -0.105), (deg(72), -0.07), (deg(98), 0.02)]
+        )
+        bottom_keys = [(0, -rz * 0.995), (deg(60), -rz * 0.97), (deg(98), -0.11)]
+        b = head_band(
+            "beard",
+            c,
+            radii,
+            1.03 if full else 1.016,
+            deg(98),
+            lambda phi: keyed(top_keys, abs(phi)),
+            lambda phi: keyed(bottom_keys, abs(phi)),
+            beard,
+        )
+        sol = b.modifiers.new("thick", "SOLIDIFY")
+        sol.thickness = 0.022 if full else 0.007
+        sol.offset = 1.0
+        part(b, ("head", None))
+
+    if LOOK.get("moustache"):
+        hair_m = mat("Moustache", LOOK.get("moustache_color", LOOK["hair"]), 0.95)
+        pts, rads = [], []
+        for i in range(9):
+            t = i / 8 * 2 - 1
+            x = t * 0.058
+            z = -0.082 - 0.016 * t * t
+            pts.append(on_face(x, z, 0.012, c, radii))
+            rads.append(0.0075 + 0.0075 * (1 - t * t))
+        part(sweep("moustache", pts, 0.012, hair_m, radii=rads), ("head", None))
 
 
 # ----------------------------------------------------------- armature -------
@@ -764,6 +933,9 @@ def render_previews(rig):
     for t in rig.animation_data.nla_tracks:
         t.mute = True
     shoot("front", (1.1, -3.4, 1.15))
+    shoot("face", (0.0, -1.35, 1.4), target=(0, 0, 1.38))
+    shoot("face34", (0.75, -1.1, 1.45), target=(0, 0, 1.4))
+    shoot("back", (-1.2, 3.2, 1.3))
     shoot("side", (3.6, -0.4, 1.0))
     shoot("walk", (2.6, -2.6, 1.0), action="Walk", frame=1)
     shoot("run", (3.2, -1.2, 1.0), action="Run", frame=3)

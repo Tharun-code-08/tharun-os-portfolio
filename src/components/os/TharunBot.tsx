@@ -7,15 +7,36 @@ import type { LifeState } from "@/lib/life";
 
 type R = [number, number, number, number, string];
 
+// Same look as the 3D model on the island (art/build_tharun.py): textured
+// hair, glasses, stubble and a moustache, black tee with the amber T, jeans.
 const SKIN = "#c98c5e";
 const SKIN_DK = "#a87049";
-const HAIR = "#221812";
-const SHIRT = "#b83b34";
-const SHIRT_DK = "#8f2b25";
-const PANTS = "#39405a";
-const PANTS_DK = "#2b3147";
+const HAIR = "#1c1410";
+const BEARD = "#7a5139";
+const MOUSTACHE = "#2e211b";
+const GLASSES = "#141418";
+const SHIRT = "#2a2a31";
+const SHIRT_DK = "#1b1b20";
+const LOGO = "#ffb020";
+const PANTS = "#3d5d8c";
+const PANTS_DK = "#2f4a72";
 const SHOE = "#ece7de";
 const EYE = "#15151b";
+
+/** Rims, bridge and the start of the temples — drawn over the eyes. */
+const SPECS: R[] = [
+  [7, 3, 4, 1, GLASSES],
+  [7, 7, 4, 1, GLASSES],
+  [7, 3, 1, 5, GLASSES],
+  [10, 3, 1, 5, GLASSES],
+  [13, 3, 4, 1, GLASSES],
+  [13, 7, 4, 1, GLASSES],
+  [13, 3, 1, 5, GLASSES],
+  [16, 3, 1, 5, GLASSES],
+  [11, 4, 2, 1, GLASSES],
+  [6, 4, 1, 1, GLASSES],
+  [17, 4, 1, 1, GLASSES],
+];
 
 /** Eyes and mouth are the whole personality — poses are secondary. */
 function face(emotion: Emotion, look: { x: number; y: number }, blinking: boolean): R[] {
@@ -28,6 +49,7 @@ function face(emotion: Emotion, look: { x: number; y: number }, blinking: boolea
       [8 + ex, 6 + ey, 2, 1, EYE],
       [14 + ex, 6 + ey, 2, 1, EYE],
       ...mouthFor(emotion),
+      ...SPECS,
     ];
   }
 
@@ -65,7 +87,7 @@ function face(emotion: Emotion, look: { x: number; y: number }, blinking: boolea
     ],
   };
 
-  return [...eyes[emotion], ...mouthFor(emotion)];
+  return [...eyes[emotion], ...mouthFor(emotion), ...SPECS];
 }
 
 function mouthFor(emotion: Emotion): R[] {
@@ -90,12 +112,23 @@ function mouthFor(emotion: Emotion): R[] {
 
 function body(pose: Pose, frame: "a" | "b"): R[] {
   const base: R[] = [
-    // head + hair
+    // head + hair: short faded sides, texture on top
     [6, 0, 12, 11, SKIN],
-    [5, -2, 14, 5, HAIR],
-    [4, 1, 2, 6, HAIR],
-    [18, 1, 2, 6, HAIR],
-    [4, -1, 3, 2, HAIR],
+    [5, -1, 14, 3, HAIR],
+    [5, -3, 2, 2, HAIR],
+    [8, -4, 2, 3, HAIR],
+    [11, -3, 2, 2, HAIR],
+    [14, -4, 2, 3, HAIR],
+    [17, -3, 2, 2, HAIR],
+    [5, 2, 1, 4, HAIR],
+    [18, 2, 1, 4, HAIR],
+    // stubble along the jaw, and the moustache (the mouth draws over it)
+    [6, 6, 1, 4, BEARD],
+    [17, 6, 1, 4, BEARD],
+    [7, 9, 2, 1, BEARD],
+    [15, 9, 2, 1, BEARD],
+    [7, 10, 10, 1, BEARD],
+    [9, 8, 6, 1, MOUSTACHE],
     // neck
     [10, 11, 4, 3, SKIN_DK],
     // torso
@@ -103,8 +136,8 @@ function body(pose: Pose, frame: "a" | "b"): R[] {
     [4, 14, 3, 20, SHIRT_DK],
     [17, 14, 3, 20, SHIRT_DK],
     // the T on the shirt
-    [9, 19, 6, 2, "#f3e6c8"],
-    [11, 21, 2, 5, "#f3e6c8"],
+    [9, 19, 6, 2, LOGO],
+    [11, 21, 2, 5, LOGO],
     // legs
     [5, 34, 6, 22, PANTS],
     [13, 34, 6, 22, PANTS],
@@ -283,7 +316,7 @@ export function TharunBot({ life }: { life: LifeState }) {
         className="pointer-events-auto h-full transition-transform duration-200 hover:-translate-y-1"
       >
         <svg
-          viewBox="0 0 34 64"
+          viewBox="0 -4 34 68"
           shapeRendering="crispEdges"
           className="h-full w-auto drop-shadow-[0_8px_18px_rgba(0,0,0,0.55)]"
           style={{ transform: `scaleX(${mark.facing})` }}

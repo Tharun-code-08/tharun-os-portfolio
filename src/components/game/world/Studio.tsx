@@ -246,8 +246,8 @@ export function Studio() {
       <group position={[-W / 2 + 0.15, f + 1.55, 1.6]} rotation-y={Math.PI / 2}>
         <Box size={[1.5, 1.0, 0.05]} color="#c99a68" />
         <Box size={[1.36, 0.86, 0.02]} position={[0, 0, 0.03]} color="#f6efe2" />
-        <Box size={[0.42, 0.52, 0.02]} position={[-0.42, 0.04, 0.045]} color={PAL.shirt} />
-        <Label position={[-0.42, 0.06, 0.06]} size={0.18}>
+        <Box size={[0.42, 0.52, 0.02]} position={[-0.42, 0.04, 0.045]} color="#26262d" />
+        <Label position={[-0.42, 0.06, 0.06]} size={0.18} color="#ffb020">
           TG
         </Label>
         <Label position={[0.25, 0.22, 0.05]} size={0.075} color="#2b2b2f" anchorX="center" maxWidth={0.8}>

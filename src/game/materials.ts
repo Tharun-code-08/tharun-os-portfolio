@@ -97,10 +97,9 @@ export const PAL = {
   leafWarm: "#d98b3a",
   trunk: "#6d4c30",
   accent: "#ffb020",
-  shirt: "#b83b34",
+  red: "#b83b34",
   skin: "#c98c5e",
   hair: "#221812",
-  pants: "#39405a",
   shoe: "#ece7de",
 } as const;
 

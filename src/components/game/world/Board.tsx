@@ -44,7 +44,7 @@ export function Board() {
         {notes.slice(0, 3).map((text, i) => (
           <group key={i} position={[-0.8 + i * 0.8, 1.32 + (i % 2) * 0.08, 0.07]} rotation-z={(i - 1) * 0.06}>
             <Box size={[0.7, 0.72, 0.01]} color={NOTE_COLORS[i % NOTE_COLORS.length]} cast={false} />
-            <mesh position={[0, 0.3, 0.012]} material={glow(PAL.shirt, 1)}>
+            <mesh position={[0, 0.3, 0.012]} material={glow(PAL.red, 1)}>
               <sphereGeometry args={[0.03, 8, 6]} />
             </mesh>
             <Label
@@ -96,7 +96,7 @@ export function Board() {
         </mesh>
         <mesh rotation-x={Math.PI / 2}>
           <torusGeometry args={[0.322, 0.03, 6, 24]} />
-          <meshToonMaterial color={PAL.shirt} />
+          <meshToonMaterial color={PAL.red} />
         </mesh>
       </RigidBody>
     </group>

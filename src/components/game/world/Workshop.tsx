@@ -176,7 +176,7 @@ export function Workshop() {
         <Box size={[0.6, 0.4, 0.02]} position={[-0.5, 1.18, -0.115]} rotation={[-0.25, 0, 0]} color={PAL.metal} />
         {/* vise + tools */}
         <Box size={[0.25, 0.2, 0.2]} position={[0.8, 1.06, 0.2]} color={PAL.metal} />
-        <Box size={[0.5, 0.04, 0.06]} position={[0.5, 0.98, -0.3]} rotation={[0, 0.4, 0]} color={PAL.shirt} />
+        <Box size={[0.5, 0.04, 0.06]} position={[0.5, 0.98, -0.3]} rotation={[0, 0.4, 0]} color={PAL.red} />
         <Cyl r={0.12} h={0.16} position={[0.3, 1.04, 0.3]} color="#e8c04a" />
         <Label position={[0, 0.9, 0.62]} size={0.11} color="#2b2b2f" font={FONT_MONO}>
           ALL PROJECTS

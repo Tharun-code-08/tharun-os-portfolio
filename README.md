@@ -82,8 +82,10 @@ nine animations (idle, walk, run, jump, fall, land, wave, interact, victory) —
 powershell -File art/run-blender.ps1 -Script art/build_tharun.py
 ```
 
-The look is the `LOOK` block at the top of the script — hair style, skin, shirt, trousers, shoes,
-glasses, beard. Change it and re-run; the game picks up the new GLB on reload. If the model ever fails
+The look is the `LOOK` block at the top of the script — textured hair with volume on top, medium-brown
+skin, rectangular glasses, stubble along the jaw and a moustache, a black tee with the amber T, jeans
+and white sneakers. Change any of it and re-run; the game picks up the new GLB on reload. The pixel
+TharunBOT in the OS (`src/components/os/TharunBot.tsx`) wears the same outfit. If the model ever fails
 to load, a procedural stand-in made of primitives takes its place.
 
 ## How it is put together
@@ -173,8 +175,6 @@ zone and interactables in `src/game/zones.ts`, and a component in `src/component
 
 ### Still to fill in
 
-- `art/build_tharun.py` — the `LOOK` block is the TharunBOT palette. Send a photo or a description and
-  it becomes me.
 - `projects.ts` — the **XR work at Ingage** entry is a stub with `published: false`.
 - `journal.ts` — `failures` and `notes` are empty, with templates in the comments.
 - `public/` — a `resume.pdf` would be better than the `.docx`. Drop one in and point

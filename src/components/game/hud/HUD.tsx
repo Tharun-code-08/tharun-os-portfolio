@@ -285,7 +285,7 @@ export function HUD({ onInteract }: { onInteract: () => void }) {
       {/* Player plate */}
       <div className="pointer-events-auto absolute top-4 left-4 flex items-center gap-3">
         <div className="hud-glass flex items-center gap-3 rounded-2xl py-2 pr-4 pl-2">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-[#d4553f] to-[#8f2b25] font-display text-[13px] font-bold text-[#f3e6c8] shadow-inner">
+          <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-[#3a3a44] to-[#16161b] font-display text-[13px] font-bold text-[#ffb020] shadow-inner ring-1 ring-[#ffb020]/30">
             TG
           </span>
           <span>

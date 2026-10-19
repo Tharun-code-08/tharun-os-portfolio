@@ -63,7 +63,7 @@ function Cabinet({ group, x, z, facing, i }: { group: StackGroup; x: number; z: 
       {/* control deck */}
       <Box size={[0.9, 0.14, 0.42]} position={[0, 1.02, 0.42]} rotation={[0.35, 0, 0]} color="#2b2b37" />
       <Cyl r={0.025} h={0.14} position={[-0.2, 1.14, 0.45]} color="#d9d2c4" />
-      <mesh position={[-0.2, 1.22, 0.45]} material={glow(PAL.shirt, 1.2)}>
+      <mesh position={[-0.2, 1.22, 0.45]} material={glow(PAL.red, 1.2)}>
         <sphereGeometry args={[0.045, 10, 8]} />
       </mesh>
       {[0.08, 0.2, 0.32].map((bx, k) => (
