@@ -11,6 +11,7 @@ import {
   MeshToonMaterial,
   NearestFilter,
   RedFormat,
+  Vector4,
   type ColorRepresentation,
 } from "three";
 
@@ -34,12 +35,21 @@ export function toonGradient() {
 
 const toonCache = new Map<string, MeshToonMaterial>();
 
-/** Cached per colour, so a hundred fence posts share one material. */
-export function toon(color: ColorRepresentation, opts: { emissive?: ColorRepresentation; glow?: number } = {}) {
-  const key = `${new Color(color).getHexString()}|${opts.emissive ?? ""}|${opts.glow ?? 0}`;
+/**
+ * Cached per colour, so a hundred fence posts share one material. `fade`
+ * gives tall, thin props (posts, poles) the trees' near-camera dissolve, so a
+ * post right in front of the lens never fills half the screen.
+ */
+export function toon(
+  color: ColorRepresentation,
+  opts: { emissive?: ColorRepresentation; glow?: number; fade?: boolean } = {},
+) {
+  const key = `${new Color(color).getHexString()}|${opts.emissive ?? ""}|${opts.glow ?? 0}|${opts.fade ? "f" : ""}`;
   let m = toonCache.get(key);
   if (!m) {
     m = new MeshToonMaterial({ color, gradientMap: toonGradient() });
+    if (opts.fade) nearFade(m);
+    else dissolve(m);
     if (opts.emissive) {
       m.emissive = new Color(opts.emissive);
       m.emissiveIntensity = opts.glow ?? 1;
@@ -114,25 +124,53 @@ export function faceted<T extends BufferGeometry>(geo: T): BufferGeometry {
 }
 
 /**
- * Screen-door fade for things the camera can end up inside (tree crowns,
- * rocks): fragments closer than `far` metres to the camera dissolve in a
- * dither pattern, gone entirely by `near`. No sorting, no transparency.
+ * The player's chest in view space (xyz) and the radius of the see-through
+ * bubble around the camera→player line (w; 0 turns it off). CameraRig writes
+ * it every frame; every toon material reads the same uniform.
  */
-export function nearFade<T extends MeshToonMaterial>(m: T, near = 1.2, far = 3.4): T {
+export const seeThrough = { value: new Vector4(0, 0, 0, 0) };
+
+/**
+ * Screen-door dissolve, no sorting and no transparency:
+ *  - anything standing between the camera and the player dissolves around
+ *    the line of sight, so a wall, a post or a crate never hides him;
+ *  - with `near`, fragments closer than `near[1]` metres to the camera fade
+ *    out too, gone by `near[0]` — for things the camera can end up inside
+ *    (tree crowns, rocks, posts).
+ */
+function dissolve<T extends MeshToonMaterial>(m: T, near?: [number, number]): T {
   m.onBeforeCompile = (shader) => {
+    shader.uniforms.uSeeThrough = seeThrough;
     shader.fragmentShader = shader.fragmentShader.replace(
       "void main() {",
-      `float nfBayer2(vec2 a) { a = floor(a); return fract(dot(a, vec2(0.5, a.y * 0.75))); }
+      `uniform vec4 uSeeThrough;
+float nfBayer2(vec2 a) { a = floor(a); return fract(dot(a, vec2(0.5, a.y * 0.75))); }
 float nfBayer4(vec2 a) { return nfBayer2(0.5 * a) * 0.25 + nfBayer2(a); }
 void main() {
   {
-    float keep = smoothstep(${near.toFixed(2)}, ${far.toFixed(2)}, length(vViewPosition));
+    float keep = 1.0;
+    ${near ? `keep = smoothstep(${near[0].toFixed(2)}, ${near[1].toFixed(2)}, length(vViewPosition));` : ""}
+    if (uSeeThrough.w > 0.0) {
+      vec3 frag = -vViewPosition;
+      vec3 seg = uSeeThrough.xyz;
+      float t = dot(frag, seg) / dot(seg, seg);
+      // Only in front of him, and not right at his feet.
+      if (t > 0.0 && t < 0.9) {
+        float d = length(frag - seg * t);
+        keep = min(keep, smoothstep(uSeeThrough.w * 0.5, uSeeThrough.w, d));
+      }
+    }
     if (keep < 0.999 && keep <= nfBayer4(gl_FragCoord.xy)) discard;
   }`,
     );
   };
-  m.customProgramCacheKey = () => `nearFade-${near}-${far}`;
+  m.customProgramCacheKey = () => `dissolve-${near ? near.join("-") : "x"}`;
   return m;
+}
+
+/** Near-camera fade (and the see-through bubble) for trees, rocks and posts. */
+export function nearFade<T extends MeshToonMaterial>(m: T, near = 1.2, far = 3.4): T {
+  return dissolve(m, [near, far]);
 }
 
 /**

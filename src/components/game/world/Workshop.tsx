@@ -69,7 +69,14 @@ function Hologram({ project, x, z, facing, i }: { project: Project; x: number; z
         <Label position={[-0.66, 0.36, 0.01]} size={0.07} color={status.color} font={FONT_MONO} anchorX="left">
           {`${project.index} · ${project.kind.toUpperCase()}`}
         </Label>
-        <Label position={[-0.66, 0.12, 0.01]} size={0.15} anchorX="left" maxWidth={1.35}>
+        {/* Long names drop a size so they wrap to two lines, not three. */}
+        <Label
+          position={[-0.66, 0.12, 0.01]}
+          size={project.name.length > 16 ? 0.09 : 0.15}
+          anchorX="left"
+          maxWidth={1.35}
+          lineHeight={1.05}
+        >
           {project.name}
         </Label>
         <Label
@@ -128,7 +135,8 @@ function StringLights({ from, to, sag = 0.8 }: { from: [number, number, number];
 export function Workshop() {
   const [cx, cz] = LAYOUT.workshop;
   const g = heightAt(cx, cz);
-  const live = sites[1];
+  // The latest thing that's live, shown on the billboard.
+  const live = sites.find((s) => s.id === "pitchmyweb") ?? sites[0];
   const [bx, bz] = [cx - 7, cz + 5];
   const bg = heightAt(bx, bz);
 
@@ -189,7 +197,7 @@ export function Workshop() {
 
       {/* String lights over the plaza */}
       {poles.map(([x, z]) => (
-        <Cyl key={`${x}${z}`} r={0.08} h={3.4} position={[x, heightAt(x, z) + 1.7, z]} color={PAL.woodDark} />
+        <Cyl key={`${x}${z}`} r={0.08} h={3.4} position={[x, heightAt(x, z) + 1.7, z]} color={PAL.woodDark} fade />
       ))}
       {poles.map(([x, z], i) => {
         const [nx, nz] = poles[(i + 1) % poles.length];

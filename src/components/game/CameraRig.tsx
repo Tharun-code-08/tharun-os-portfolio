@@ -4,11 +4,13 @@ import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useRapier } from "@react-three/rapier";
 import { MathUtils, PerspectiveCamera, Vector3 } from "three";
+import { seeThrough as seeThroughBubble } from "@/game/materials";
 import { runtime } from "@/game/runtime";
 import { useGame } from "@/game/store";
 import { MONITOR } from "@/game/zones";
 
 const FOV = 50;
+const IDENTITY = { x: 0, y: 0, z: 0, w: 1 };
 const DIVE_MS = 1300;
 const EXIT_MS = 1400;
 const INTRO_MS = 3200;
@@ -47,10 +49,13 @@ export function CameraRig() {
       right: new Vector3(),
       monitor: new Vector3(MONITOR.x, MONITOR.y, MONITOR.z),
       monitorCam: new Vector3(MONITOR.x, MONITOR.y + 0.02, MONITOR.z + 0.62),
+      chest: new Vector3(),
     }),
     [],
   );
-  const ray = useMemo(() => new rapier.Ray({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 1 }), [rapier]);
+  // A small ball, not a ray: a thin ray slips past posts and poles that still
+  // fill half the frame once the camera is behind them.
+  const probe = useMemo(() => new rapier.Ball(0.25), [rapier]);
 
   // Drag to orbit, wheel / pinch to zoom.
   useEffect(() => {
@@ -122,19 +127,21 @@ export function CameraRig() {
     v.offset.set(Math.sin(c.yaw) * Math.cos(pitch), Math.sin(pitch), Math.cos(c.yaw) * Math.cos(pitch));
 
     // Keep a wall from ever standing between the camera and the player.
-    ray.origin = v.target;
-    ray.dir = v.offset;
-    const hit = world.castRay(
-      ray,
+    const hit = world.castShape(
+      v.target,
+      IDENTITY,
+      v.offset,
+      probe,
+      0,
       dist,
-      true,
+      false,
       rapier.QueryFilterFlags.EXCLUDE_SENSORS | rapier.QueryFilterFlags.EXCLUDE_KINEMATIC,
       undefined,
       undefined,
       undefined,
       seeThrough,
     );
-    const safe = hit ? Math.max(1.4, hit.timeOfImpact - 0.35) : dist;
+    const safe = hit ? Math.max(1.4, hit.time_of_impact - 0.1) : dist;
 
     out.pos.copy(v.target).addScaledVector(v.offset, safe);
     out.look.copy(v.target);
@@ -233,6 +240,16 @@ export function CameraRig() {
     }
     cam.position.copy(cur.pos);
     cam.lookAt(cur.look);
+
+    // See-through bubble: whatever stands between the lens and him dissolves.
+    if (g.mode === "play") {
+      cam.updateMatrixWorld();
+      const p = runtime.player.position;
+      v.chest.set(p.x, p.y + 1.0, p.z).applyMatrix4(cam.matrixWorldInverse);
+      seeThroughBubble.value.set(v.chest.x, v.chest.y, v.chest.z, 0.9);
+    } else {
+      seeThroughBubble.value.w = 0;
+    }
   });
 
   return null;

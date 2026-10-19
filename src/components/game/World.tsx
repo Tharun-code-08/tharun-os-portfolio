@@ -26,10 +26,12 @@ import { Life } from "./world/Life";
 function DevHandle() {
   const advance = useThree((s) => s.advance);
   const gl = useThree((s) => s.gl);
+  const scene = useThree((s) => s.scene);
+  const camera = useThree((s) => s.camera);
   useEffect(() => {
     if (process.env.NODE_ENV === "production") return;
-    (window as unknown as { __r3f: unknown }).__r3f = { advance, gl, runtime, game: useGame, emit };
-  }, [advance, gl]);
+    (window as unknown as { __r3f: unknown }).__r3f = { advance, gl, scene, camera, runtime, game: useGame, emit };
+  }, [advance, gl, scene, camera]);
   return null;
 }
 

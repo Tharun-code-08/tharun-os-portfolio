@@ -1,8 +1,8 @@
 "use client";
 
 import { Text } from "@react-three/drei";
-import type { ComponentProps, ReactNode } from "react";
-import type { ColorRepresentation, Material } from "three";
+import { useMemo, type ComponentProps, type ReactNode } from "react";
+import { DoubleSide, FrontSide, MeshBasicMaterial, type ColorRepresentation, type Material } from "three";
 import { toon } from "@/game/materials";
 
 /**
@@ -22,6 +22,7 @@ export function Box({
   color,
   material,
   cast = true,
+  fade = false,
   children,
 }: {
   size: V3;
@@ -30,10 +31,18 @@ export function Box({
   color?: ColorRepresentation;
   material?: Material;
   cast?: boolean;
+  /** Dissolve near the camera (posts, poles). */
+  fade?: boolean;
   children?: ReactNode;
 }) {
   return (
-    <mesh position={position} rotation={rotation} material={material ?? toon(color ?? "#ffffff")} castShadow={cast} receiveShadow>
+    <mesh
+      position={position}
+      rotation={rotation}
+      material={material ?? toon(color ?? "#ffffff", { fade })}
+      castShadow={cast}
+      receiveShadow
+    >
       <boxGeometry args={size} />
       {children}
     </mesh>
@@ -50,6 +59,7 @@ export function Cyl({
   material,
   segments = 14,
   cast = true,
+  fade = false,
 }: {
   r: number;
   rTop?: number;
@@ -60,23 +70,44 @@ export function Cyl({
   material?: Material;
   segments?: number;
   cast?: boolean;
+  /** Dissolve near the camera (posts, poles). */
+  fade?: boolean;
 }) {
   return (
-    <mesh position={position} rotation={rotation} material={material ?? toon(color ?? "#ffffff")} castShadow={cast} receiveShadow>
+    <mesh
+      position={position}
+      rotation={rotation}
+      material={material ?? toon(color ?? "#ffffff", { fade })}
+      castShadow={cast}
+      receiveShadow
+    >
       <cylinderGeometry args={[rTop ?? r, r, h, segments]} />
     </mesh>
   );
 }
 
+/**
+ * Text on a sign, a card or a plaque. Front side only: from behind you see the
+ * back of whatever it is printed on, never the words mirrored. Each label gets
+ * its own material because troika writes the colour into it.
+ */
 export function Label({
   children,
   size = 0.3,
   color = "#fff7e8",
   font = FONT_DISPLAY,
+  doubleSided = false,
   ...rest
-}: { children: string; size?: number; font?: string } & Omit<ComponentProps<typeof Text>, "children" | "font">) {
+}: { children: string; size?: number; font?: string; doubleSided?: boolean } & Omit<
+  ComponentProps<typeof Text>,
+  "children" | "font"
+>) {
+  const material = useMemo(
+    () => new MeshBasicMaterial({ transparent: true, side: doubleSided ? DoubleSide : FrontSide }),
+    [doubleSided],
+  );
   return (
-    <Text font={font} fontSize={size} color={color} anchorX="center" anchorY="middle" {...rest}>
+    <Text font={font} fontSize={size} color={color} anchorX="center" anchorY="middle" material={material} {...rest}>
       {children}
     </Text>
   );

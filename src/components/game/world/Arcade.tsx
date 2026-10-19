@@ -147,16 +147,16 @@ export function Arcade() {
 
       {/* Canopy */}
       {posts.map(([x, z]) => (
-        <Box key={`${x}${z}`} size={[0.32, top - g, 0.32]} position={[x, g + (top - g) / 2, z]} color="#2b2b37" />
+        <Box key={`${x}${z}`} size={[0.32, top - g, 0.32]} position={[x, g + (top - g) / 2, z]} color="#2b2b37" fade />
       ))}
       <Cutaway x={cx} z={cz} halfX={S / 2} halfZ={S / 2} below={top - 1}>
         <Box size={[S, 0.3, S]} position={[cx, top - 0.15, cz]} color="#3a2f4a" />
+        <Box size={[S + 0.2, 0.08, S + 0.2]} position={[cx, top - 0.32, cz]} material={glow("#c77dff", 1.3)} cast={false} />
       </Cutaway>
-      <Box size={[S + 0.2, 0.08, S + 0.2]} position={[cx, top - 0.32, cz]} material={glow("#c77dff", 1.3)} cast={false} />
 
       {/* Neon sign on the roof edge facing the studio */}
       <group position={[cx + S / 2 + 0.05, top + 0.55, cz]} rotation-y={Math.PI / 2}>
-        <Box size={[4.2, 1.0, 0.12]} color="#14101c" />
+        <Box size={[4.2, 1.0, 0.12]} color="#14101c" fade />
         <Label position={[0, 0.02, 0.08]} size={0.48} color="#ff4fd8" material={sign}>
           ARCADE
         </Label>

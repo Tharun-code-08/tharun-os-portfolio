@@ -169,7 +169,7 @@ export function Studio() {
       </mesh>
       {/* corner posts */}
       {[-W / 2, W / 2].map((x) => (
-        <Box key={x} size={[0.32, H + 0.1, 0.32]} position={[x, f + H / 2, D / 2]} color={PAL.woodDark} />
+        <Box key={x} size={[0.32, H + 0.1, 0.32]} position={[x, f + H / 2, D / 2]} color={PAL.woodDark} fade />
       ))}
 
       {/* Roof and front beam — fade away while you are inside, since from the
